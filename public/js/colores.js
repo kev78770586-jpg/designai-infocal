@@ -10,6 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabConcepto = document.getElementById('tabModoConcepto');
   const tabImagen = document.getElementById('tabModoImagen');
   const fileInput = document.getElementById('imagenPaleta');
+  const dropZonePaleta = document.getElementById('dropZonePaleta');
+  const fileBadgePaleta = document.getElementById('fileSelectedBadgePaleta');
+  const fileNameDisplayPaleta = document.getElementById('fileNameDisplayPaleta');
+  const fileSizeDisplayPaleta = document.getElementById('fileSizeDisplayPaleta');
+  const fileErrorMsgPaleta = document.getElementById('fileErrorMsgPaleta');
   const previewContainer = document.getElementById('paletteImagePreviewContainer');
   const previewImg = document.getElementById('paletteImagePreview');
   const resultsContainer = document.getElementById('resultsContainer');
@@ -35,19 +40,61 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function updatePaletteFileDisplay(file) {
+    if (!file) {
+      if (previewContainer) previewContainer.classList.add('hidden');
+      if (fileBadgePaleta) fileBadgePaleta.classList.add('hidden');
+      return;
+    }
+    if (fileErrorMsgPaleta) fileErrorMsgPaleta.classList.add('hidden');
+    if (dropZonePaleta) dropZonePaleta.classList.remove('border-red-400', 'bg-red-50/20');
+
+    if (fileNameDisplayPaleta) fileNameDisplayPaleta.textContent = file.name;
+    if (fileSizeDisplayPaleta) {
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+      fileSizeDisplayPaleta.textContent = `${sizeMb} MB`;
+    }
+    if (fileBadgePaleta) fileBadgePaleta.classList.remove('hidden');
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (previewImg) previewImg.src = event.target.result;
+      if (previewContainer) previewContainer.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  }
+
   // Previsualización de imagen seleccionada
   if (fileInput) {
     fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          previewImg.src = event.target.result;
-          previewContainer.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-      } else {
-        previewContainer.classList.add('hidden');
+      const file = e.target.files && e.target.files[0];
+      updatePaletteFileDisplay(file);
+    });
+  }
+
+  // Drag and Drop para Paletas de Color
+  if (dropZonePaleta && fileInput) {
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZonePaleta.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZonePaleta.classList.add('border-indigo-600', 'bg-indigo-100/40');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZonePaleta.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZonePaleta.classList.remove('border-indigo-600', 'bg-indigo-100/40');
+      });
+    });
+
+    dropZonePaleta.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length > 0) {
+        fileInput.files = dt.files;
+        updatePaletteFileDisplay(dt.files[0]);
       }
     });
   }
@@ -80,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const res = await fetch('/api/colores/generar', {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             concepto: `${concepto} (Sector: ${rubro}, Armonía: ${armonia}, Salida: ${medio})`,
@@ -114,9 +162,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const submitBtn = formImagen.querySelector('button[type="submit"]');
       const originalBtnText = submitBtn.innerHTML;
 
-      const file = fileInput.files[0];
+      const file = fileInput.files && fileInput.files[0];
       if (!file) {
-        alert('Por favor selecciona una imagen para extraer su paleta.');
+        if (fileErrorMsgPaleta) {
+          fileErrorMsgPaleta.textContent = '⚠️ Por favor selecciona o arrastra una imagen para extraer los colores.';
+          fileErrorMsgPaleta.classList.remove('hidden');
+        }
+        if (dropZonePaleta) {
+          dropZonePaleta.classList.add('border-red-400', 'bg-red-50/20');
+          dropZonePaleta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
         return;
       }
 
@@ -135,6 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const res = await fetch('/api/colores/extraer-imagen', {
           method: 'POST',
+          credentials: 'include',
           body: formData
         });
 
@@ -378,7 +434,6 @@ document.addEventListener('DOMContentLoaded', () => {
       window.print();
     }
   }
-  }
 
   // Función global para copiar HEX
   window.copyHex = function(hex) {
@@ -396,7 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadPaletteHistory() {
     if (!historyContainer) return;
     try {
-      const res = await fetch('/api/colores/historial');
+      const res = await fetch('/api/colores/historial', { credentials: 'include' });
       if (!res.ok) return;
       const data = await res.json();
       if (!data.exito || !data.paletas || data.paletas.length === 0) {

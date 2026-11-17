@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const res = await fetch('/api/ideas/generar', {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             brief: `${brief} (Emoción detonante: ${emocion}, Enfoque: ${enfoque})`,
@@ -251,14 +252,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-      </div>
-    `;
-  }
-
   async function loadIdeasHistory() {
     if (!historyContainer) return;
     try {
-      const res = await fetch('/api/ideas/historial');
+      const res = await fetch('/api/ideas/historial', { credentials: 'include' });
       if (!res.ok) return;
       const data = await res.json();
       if (!data.exito || !data.ideas || data.ideas.length === 0) {

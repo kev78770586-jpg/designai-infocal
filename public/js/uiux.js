@@ -6,23 +6,70 @@
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('uiuxForm');
   const fileInput = document.getElementById('imagenInterfaz');
+  const dropZoneUIUX = document.getElementById('dropZoneUIUX');
+  const fileBadgeUIUX = document.getElementById('fileSelectedBadgeUIUX');
+  const fileNameDisplayUIUX = document.getElementById('fileNameDisplayUIUX');
+  const fileSizeDisplayUIUX = document.getElementById('fileSizeDisplayUIUX');
+  const fileErrorMsgUIUX = document.getElementById('fileErrorMsgUIUX');
   const previewContainer = document.getElementById('imagePreviewContainer');
   const previewImg = document.getElementById('imagePreview');
   const resultsContainer = document.getElementById('resultsContainer');
   const historyContainer = document.getElementById('historyContainer');
 
+  function updateUIUXFileDisplay(file) {
+    if (!file) {
+      if (previewContainer) previewContainer.classList.add('hidden');
+      if (fileBadgeUIUX) fileBadgeUIUX.classList.add('hidden');
+      return;
+    }
+    if (fileErrorMsgUIUX) fileErrorMsgUIUX.classList.add('hidden');
+    if (dropZoneUIUX) dropZoneUIUX.classList.remove('border-red-400', 'bg-red-50/20');
+
+    if (fileNameDisplayUIUX) fileNameDisplayUIUX.textContent = file.name;
+    if (fileSizeDisplayUIUX) {
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+      fileSizeDisplayUIUX.textContent = `${sizeMb} MB`;
+    }
+    if (fileBadgeUIUX) fileBadgeUIUX.classList.remove('hidden');
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (previewImg) previewImg.src = event.target.result;
+      if (previewContainer) previewContainer.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  }
+
   if (fileInput) {
     fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          previewImg.src = event.target.result;
-          previewContainer.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-      } else {
-        previewContainer.classList.add('hidden');
+      const file = e.target.files && e.target.files[0];
+      updateUIUXFileDisplay(file);
+    });
+  }
+
+  // Drag and Drop para UI/UX
+  if (dropZoneUIUX && fileInput) {
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZoneUIUX.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZoneUIUX.classList.add('border-emerald-600', 'bg-emerald-100/40');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZoneUIUX.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZoneUIUX.classList.remove('border-emerald-600', 'bg-emerald-100/40');
+      });
+    });
+
+    dropZoneUIUX.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length > 0) {
+        fileInput.files = dt.files;
+        updateUIUXFileDisplay(dt.files[0]);
       }
     });
   }
@@ -33,9 +80,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const submitBtn = form.querySelector('button[type="submit"]');
       const originalBtnText = submitBtn.innerHTML;
 
-      const file = fileInput.files[0];
+      const file = fileInput.files && fileInput.files[0];
       if (!file) {
-        alert('Por favor selecciona una captura de pantalla de la interfaz para evaluar.');
+        if (fileErrorMsgUIUX) {
+          fileErrorMsgUIUX.textContent = '⚠️ Por favor selecciona o arrastra una captura de interfaz para auditar.';
+          fileErrorMsgUIUX.classList.remove('hidden');
+        }
+        if (dropZoneUIUX) {
+          dropZoneUIUX.classList.add('border-red-400', 'bg-red-50/20');
+          dropZoneUIUX.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
         return;
       }
 
@@ -65,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const res = await fetch('/api/uiux/evaluar', {
           method: 'POST',
+          credentials: 'include',
           body: formData
         });
 
@@ -320,12 +375,11 @@ document.addEventListener('DOMContentLoaded', () => {
       window.print();
     }
   }
-  }
 
   async function loadUIUXHistory() {
     if (!historyContainer) return;
     try {
-      const res = await fetch('/api/uiux/historial');
+      const res = await fetch('/api/uiux/historial', { credentials: 'include' });
       if (!res.ok) return;
       const data = await res.json();
       if (!data.exito || !data.evaluaciones || data.evaluaciones.length === 0) {

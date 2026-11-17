@@ -46,7 +46,7 @@ app.use(session({
   saveUninitialized: false,
   proxy: true,
   cookie: {
-    secure: 'auto',
+    secure: false, // Compatible con HTTP local y HTTPS en producción Railway
     httpOnly: true,
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días de sesión activa

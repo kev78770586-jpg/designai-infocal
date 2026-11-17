@@ -6,24 +6,76 @@
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('analizadorForm');
   const fileInput = document.getElementById('imagenDiseno');
+  const dropZone = document.getElementById('dropZoneAnalizador');
+  const fileBadge = document.getElementById('fileSelectedBadge');
+  const fileNameDisplay = document.getElementById('fileNameDisplay');
+  const fileSizeDisplay = document.getElementById('fileSizeDisplay');
+  const fileErrorMsg = document.getElementById('fileErrorMsg');
   const previewContainer = document.getElementById('imagePreviewContainer');
   const previewImg = document.getElementById('imagePreview');
   const resultsContainer = document.getElementById('resultsContainer');
   const historyContainer = document.getElementById('historyContainer');
 
-  // Previsualización de imagen seleccionada
+  function updateFileDisplay(file) {
+    if (!file) {
+      if (fileBadge) fileBadge.classList.add('hidden');
+      if (previewContainer) previewContainer.classList.add('hidden');
+      return;
+    }
+    if (fileErrorMsg) {
+      fileErrorMsg.classList.add('hidden');
+      fileErrorMsg.textContent = '';
+    }
+    if (dropZone) dropZone.classList.remove('border-red-400', 'bg-red-50/20');
+
+    // Nombre y tamaño legible
+    if (fileNameDisplay) fileNameDisplay.textContent = file.name;
+    if (fileSizeDisplay) {
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+      fileSizeDisplay.textContent = `${sizeMb} MB`;
+    }
+    if (fileBadge) fileBadge.classList.remove('hidden');
+
+    // Previsualización instantánea
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      previewImg.src = event.target.result;
+      previewContainer.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Previsualización y actualización cuando el usuario selecciona archivo
   if (fileInput) {
     fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          previewImg.src = event.target.result;
-          previewContainer.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-      } else {
-        previewContainer.classList.add('hidden');
+      updateFileDisplay(file);
+    });
+  }
+
+  // Soporte completo de Arrastrar y Soltar (Drag & Drop)
+  if (dropZone && fileInput) {
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add('border-blue-600', 'bg-blue-100/40');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove('border-blue-600', 'bg-blue-100/40');
+      });
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length > 0) {
+        fileInput.files = dt.files;
+        updateFileDisplay(dt.files[0]);
       }
     });
   }
@@ -35,9 +87,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const submitBtn = form.querySelector('button[type="submit"]');
       const originalBtnText = submitBtn.innerHTML;
 
-      const file = fileInput.files[0];
+      const file = fileInput.files && fileInput.files[0];
       if (!file) {
-        alert('Por favor selecciona una imagen para analizar.');
+        if (fileErrorMsg) {
+          fileErrorMsg.textContent = '⚠️ Por favor selecciona o arrastra una imagen para que la IA pueda evaluarla.';
+          fileErrorMsg.classList.remove('hidden');
+        }
+        if (dropZone) {
+          dropZone.classList.add('border-red-400', 'bg-red-50/20');
+          dropZone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
         return;
       }
 
@@ -46,10 +105,10 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         submitBtn.disabled = true;
         submitBtn.innerHTML = `
-          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" fill="none" viewBox="0 0 24 24">
+          <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg> Analizando composición con Gemini...
+          </svg> Analizando composición con IA...
         `;
 
         resultsContainer.innerHTML = `
@@ -67,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const res = await fetch('/api/analizador/evaluar', {
           method: 'POST',
+          credentials: 'include',
           body: formData
         });
 
@@ -323,13 +383,12 @@ document.addEventListener('DOMContentLoaded', () => {
       window.print();
     }
   }
-  }
 
   // Cargar historial de análisis
   async function loadAnalysisHistory() {
     if (!historyContainer) return;
     try {
-      const res = await fetch('/api/analizador/historial');
+      const res = await fetch('/api/analizador/historial', { credentials: 'include' });
       if (!res.ok) return;
       const data = await res.json();
       if (!data.exito || !data.analisis || data.analisis.length === 0) {

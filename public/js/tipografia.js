@@ -10,6 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabConcepto = document.getElementById('tabModoConcepto');
   const tabImagen = document.getElementById('tabModoImagen');
   const fileInput = document.getElementById('imagenTipografia');
+  const dropZoneTypo = document.getElementById('dropZoneTipografia');
+  const fileBadgeTypo = document.getElementById('fileSelectedBadgeTypo');
+  const fileNameDisplayTypo = document.getElementById('fileNameDisplayTypo');
+  const fileSizeDisplayTypo = document.getElementById('fileSizeDisplayTypo');
+  const fileErrorMsgTypo = document.getElementById('fileErrorMsgTypo');
   const previewContainer = document.getElementById('typoImagePreviewContainer');
   const previewImg = document.getElementById('typoImagePreview');
   const resultsContainer = document.getElementById('resultsContainer');
@@ -35,19 +40,61 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function updateTypoFileDisplay(file) {
+    if (!file) {
+      if (previewContainer) previewContainer.classList.add('hidden');
+      if (fileBadgeTypo) fileBadgeTypo.classList.add('hidden');
+      return;
+    }
+    if (fileErrorMsgTypo) fileErrorMsgTypo.classList.add('hidden');
+    if (dropZoneTypo) dropZoneTypo.classList.remove('border-red-400', 'bg-red-50/20');
+
+    if (fileNameDisplayTypo) fileNameDisplayTypo.textContent = file.name;
+    if (fileSizeDisplayTypo) {
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+      fileSizeDisplayTypo.textContent = `${sizeMb} MB`;
+    }
+    if (fileBadgeTypo) fileBadgeTypo.classList.remove('hidden');
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (previewImg) previewImg.src = event.target.result;
+      if (previewContainer) previewContainer.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  }
+
   // Previsualización de imagen seleccionada
   if (fileInput) {
     fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          previewImg.src = event.target.result;
-          previewContainer.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-      } else {
-        previewContainer.classList.add('hidden');
+      const file = e.target.files && e.target.files[0];
+      updateTypoFileDisplay(file);
+    });
+  }
+
+  // Soporte Drag and Drop para Tipografía
+  if (dropZoneTypo && fileInput) {
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZoneTypo.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZoneTypo.classList.add('border-purple-600', 'bg-purple-100/40');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZoneTypo.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZoneTypo.classList.remove('border-purple-600', 'bg-purple-100/40');
+      });
+    });
+
+    dropZoneTypo.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length > 0) {
+        fileInput.files = dt.files;
+        updateTypoFileDisplay(dt.files[0]);
       }
     });
   }
@@ -78,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const res = await fetch('/api/tipografia/recomendar', {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             tipo_proyecto,
@@ -115,9 +163,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const submitBtn = formImagen.querySelector('button[type="submit"]');
       const originalBtnText = submitBtn.innerHTML;
 
-      const file = fileInput.files[0];
+      const file = fileInput.files && fileInput.files[0];
       if (!file) {
-        alert('Por favor selecciona o arrastra una imagen para analizar su tipografía.');
+        if (fileErrorMsgTypo) {
+          fileErrorMsgTypo.textContent = '⚠️ Por favor selecciona o arrastra una imagen para analizar la tipografía.';
+          fileErrorMsgTypo.classList.remove('hidden');
+        }
+        if (dropZoneTypo) {
+          dropZoneTypo.classList.add('border-red-400', 'bg-red-50/20');
+          dropZoneTypo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
         return;
       }
 
@@ -136,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const res = await fetch('/api/tipografia/recomendar-imagen', {
           method: 'POST',
+          credentials: 'include',
           body: formData
         });
 
@@ -390,14 +446,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-      </div>
-    `;
-  }
-
   async function loadTypographyHistory() {
     if (!historyContainer) return;
     try {
-      const res = await fetch('/api/tipografia/historial');
+      const res = await fetch('/api/tipografia/historial', { credentials: 'include' });
       if (!res.ok) return;
       const data = await res.json();
       if (!data.exito || !data.tipografias || data.tipografias.length === 0) {
