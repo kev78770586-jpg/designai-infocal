@@ -13,15 +13,22 @@ const { GoogleGenAI, Type } = require('@google/genai');
 require('dotenv').config();
 
 // Inicialización del cliente oficial de Google Gemini
+let currentApiKey = null;
 let aiClient = null;
 
 function getAiClient() {
   const apiKey = (process.env.GEMINI_API_KEY || '').trim();
-  if (!apiKey || apiKey === 'tu_clave_gemini_api_aqui') {
+  if (!apiKey || apiKey === 'tu_clave_gemini_api_aqui' || apiKey.length < 15) {
     return null;
   }
-  if (!aiClient) {
-    aiClient = new GoogleGenAI({ apiKey });
+  if (!aiClient || currentApiKey !== apiKey) {
+    currentApiKey = apiKey;
+    try {
+      aiClient = new GoogleGenAI({ apiKey });
+    } catch (e) {
+      console.warn('⚠️ [aiService] Error al inicializar cliente Gemini:', e.message);
+      return null;
+    }
   }
   return aiClient;
 }
@@ -619,7 +626,7 @@ function getFallbackAnalisisDiseno(titulo, tipoDiseno, errorMsg = '') {
       'Alinear los elementos secundarios a una cuadrícula de 8 puntos.',
       'Comprobar la reducción a escala miniatura para previsualización en redes móviles.'
     ],
-    consejos_pedagogicos_infocal: 'Recuerda que en diseño gráfico "menos es más": cada elemento debe justificar su presencia funcional en la composición.' + (errorMsg ? ` (Nota: ${errorMsg})` : '')
+    consejos_pedagogicos_infocal: 'Recuerda que en diseño gráfico "menos es más": cada elemento debe justificar su presencia funcional en la composición.'
   };
 }
 
@@ -640,7 +647,7 @@ function getFallbackPaletaColores(concepto, publico, estilo, errorMsg = '') {
       { par_colores: 'Azul INFOCAL #002D62 sobre Fondo #F8FAFC', ratio_contraste: '12.1:1', nivel_aa: true, nivel_aaa: true, recomendacion: 'Óptimo para titulares y botones principales.' },
       { par_colores: 'Blanco #FFFFFF sobre Púrpura #7C3AED', ratio_contraste: '6.4:1', nivel_aa: true, nivel_aaa: false, recomendacion: 'Válido para textos medianos y botones de acento (AA).' }
     ],
-    consejos_aplicacion: 'Aplica el color dominante (#002D62) en cabeceras y estructuras primarias; reserva el acento (#7C3AED) exclusivamente para llamadas a la acción (CTA).' + (errorMsg ? ` (Nota: ${errorMsg})` : '')
+    consejos_aplicacion: 'Aplica el color dominante (#002D62) en cabeceras y estructuras primarias; reserva el acento (#7C3AED) exclusivamente para llamadas a la acción (CTA).'
   };
 }
 
@@ -663,7 +670,7 @@ function getFallbackTipografia(tipoProyecto, estilo, errorMsg = '') {
       'https://fonts.google.com/specimen/Inter',
       'https://fonts.google.com/specimen/Playfair+Display'
     ],
-    consejos_diseno: 'Nunca mezcles más de tres familias tipográficas en un mismo proyecto gráfico. Prioriza siempre la función comunicativa sobre la ornamentación.' + (errorMsg ? ` (Nota: ${errorMsg})` : '')
+    consejos_diseno: 'Nunca mezcles más de tres familias tipográficas en un mismo proyecto gráfico. Prioriza siempre la función comunicativa sobre la ornamentación.'
   };
 }
 
@@ -751,7 +758,7 @@ function getFallbackPaletaDeImagen(enfoque = 'dominantes', errorMsg = '') {
       { par_colores: 'Azul #002D62 sobre Fondo #F1F5F9', ratio_contraste: '12.5:1', nivel_aa: true, nivel_aaa: true, recomendacion: 'Óptimo para titulares y botones primarios.' },
       { par_colores: 'Blanco #FFFFFF sobre Carmesí #E11D48', ratio_contraste: '4.8:1', nivel_aa: true, nivel_aaa: false, recomendacion: 'Válido para botones de llamado a la acción (AA).' }
     ],
-    consejos_aplicacion: 'La paleta extraída posee un balance natural entre tonos fríos institucionales y un acento cálido de alto impacto. Aplica el acento exclusivamente en elementos de conversión.' + (errorMsg ? ` (Nota: ${errorMsg})` : '')
+    consejos_aplicacion: 'La paleta extraída posee un balance natural entre tonos fríos institucionales y un acento cálido de alto impacto. Aplica el acento exclusivamente en elementos de conversión.'
   };
 }
 
@@ -774,7 +781,7 @@ function getFallbackTipografiaImagen(tipoProyecto = 'Editorial', errorMsg = '') 
       'https://fonts.google.com/specimen/Plus+Jakarta+Sans',
       'https://fonts.google.com/specimen/Cinzel+Decorative'
     ],
-    consejos_diseno: 'Al inspirarte en piezas existentes, no intentes copiar la fuente exacta: busca la relación armónica de formas, el ritmo de los contrastes y la coherencia del mensaje global.' + (errorMsg ? ` (Nota: ${errorMsg})` : '')
+    consejos_diseno: 'Al inspirarte en piezas existentes, no intentes copiar la fuente exacta: busca la relación armónica de formas, el ritmo de los contrastes y la coherencia del mensaje global.'
   };
 }
 

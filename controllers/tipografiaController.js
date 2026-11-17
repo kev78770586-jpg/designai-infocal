@@ -4,6 +4,7 @@
  */
 const { AsistenteTipografico, HistorialActividad } = require('../models');
 const aiService = require('../services/aiService');
+const memoryHistory = require('../services/memoryHistory');
 
 /**
  * Recomienda combinaciones tipográficas y jerarquías visuales
@@ -64,6 +65,17 @@ async function recomendarTipografia(req, res) {
         creado_en: new Date()
       };
     }
+
+    memoryHistory.addTipografia({
+      id: nuevoRegistro.id,
+      usuario_id: usuario.id,
+      tipo_proyecto: tipo_proyecto.trim(),
+      estilo_deseado: estilo_deseado.trim(),
+      fuente_titulo: resultadoIA.fuente_titulo,
+      fuente_cuerpo: resultadoIA.fuente_cuerpo,
+      resultado_json: resultadoIA,
+      creado_en: nuevoRegistro.creado_en || new Date()
+    });
 
     return res.status(201).json({
       exito: true,
@@ -148,6 +160,18 @@ async function recomendarTipografiaImagen(req, res) {
       };
     }
 
+    memoryHistory.addTipografia({
+      id: nuevoRegistro.id,
+      usuario_id: usuario.id,
+      tipo_proyecto: req.body.tipo_proyecto || 'Editorial / Imagen',
+      estilo_deseado: req.body.estilo_deseado || 'Emparejamiento visual',
+      fuente_titulo: resultadoIA.fuente_titulo,
+      fuente_cuerpo: resultadoIA.fuente_cuerpo,
+      imagen_url: imagenUrl,
+      resultado_json: resultadoIA,
+      creado_en: nuevoRegistro.creado_en || new Date()
+    });
+
     return res.status(201).json({
       exito: true,
       mensaje: '¡Tipografía identificada y combinaciones recomendadas con éxito!',
@@ -177,8 +201,18 @@ async function getHistorialTipografia(req, res) {
         order: [['creado_en', 'DESC']],
         limit: 20
       });
+      if (registros.length === 0) {
+        registros = await AsistenteTipografico.findAll({
+          order: [['creado_en', 'DESC']],
+          limit: 20
+        });
+      }
     } catch (dbErr) {
       console.warn('⚠️ [tipografiaController.getHistorial] DB offline');
+    }
+
+    if (registros.length === 0) {
+      registros = memoryHistory.getTipografias(usuario.id);
     }
 
     return res.json({

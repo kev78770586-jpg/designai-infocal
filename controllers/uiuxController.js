@@ -4,6 +4,7 @@
  */
 const { EvaluadorUIUX, HistorialActividad } = require('../models');
 const aiService = require('../services/aiService');
+const memoryHistory = require('../services/memoryHistory');
 
 /**
  * Evalúa capturas de pantalla de interfaces móviles o de escritorio
@@ -81,6 +82,17 @@ async function evaluarInterfaz(req, res) {
       };
     }
 
+    memoryHistory.addUIUX({
+      id: nuevoRegistro.id,
+      usuario_id: usuario.id,
+      titulo_pantalla: (titulo_pantalla || 'Interfaz de Usuario').trim(),
+      tipo_dispositivo: tipo_dispositivo || 'mobile',
+      imagen_url: imagenUrl,
+      puntaje_usabilidad: resultadoIA.puntaje_usabilidad,
+      resultado_json: resultadoIA,
+      creado_en: nuevoRegistro.creado_en || new Date()
+    });
+
     return res.status(201).json({
       exito: true,
       mensaje: '¡Auditoría UI/UX completada exitosamente!',
@@ -110,8 +122,18 @@ async function getHistorialUIUX(req, res) {
         order: [['creado_en', 'DESC']],
         limit: 20
       });
+      if (registros.length === 0) {
+        registros = await EvaluadorUIUX.findAll({
+          order: [['creado_en', 'DESC']],
+          limit: 20
+        });
+      }
     } catch (dbErr) {
       console.warn('⚠️ [uiuxController.getHistorial] DB offline');
+    }
+
+    if (registros.length === 0) {
+      registros = memoryHistory.getUIUX(usuario.id);
     }
 
     return res.json({

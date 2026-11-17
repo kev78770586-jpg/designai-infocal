@@ -400,18 +400,21 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      historyContainer.innerHTML = data.analisis.map(item => `
-        <div class="flex items-center space-x-4 p-3 hover:bg-slate-50 rounded-2xl transition border border-slate-100">
-          <img src="${item.imagen_url}" alt="${item.titulo_diseno}" class="w-14 h-14 object-cover rounded-xl border border-slate-200">
+      window.cachedAnalysisHistory = data.analisis;
+
+      historyContainer.innerHTML = data.analisis.map((item, idx) => `
+        <div onclick="verAnalisisHistorial(${idx})" class="flex items-center space-x-3 p-3 hover:bg-blue-50/70 rounded-2xl transition border border-slate-100 hover:border-blue-300 cursor-pointer group shadow-sm">
+          <img src="${item.imagen_url}" alt="${item.titulo_diseno}" class="w-12 h-12 object-cover rounded-xl border border-slate-200 group-hover:scale-105 transition-transform flex-shrink-0">
           <div class="flex-1 min-w-0">
-            <h4 class="text-xs font-bold text-slate-800 truncate">${item.titulo_diseno}</h4>
-            <p class="text-[11px] text-slate-400 uppercase tracking-wider">${item.tipo_diseno}</p>
+            <h4 class="text-xs font-bold text-slate-800 truncate group-hover:text-blue-700 transition-colors">${item.titulo_diseno}</h4>
+            <p class="text-[10px] text-slate-400 uppercase tracking-wider">${item.tipo_diseno}</p>
             <span class="text-[10px] text-slate-400">${new Date(item.creado_en).toLocaleDateString('es-BO')}</span>
           </div>
-          <div class="text-right">
-            <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-blue-50 text-blue-800 border border-blue-200">
+          <div class="text-right flex-shrink-0">
+            <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-blue-50 text-blue-800 border border-blue-200 block">
               ${item.puntaje_general || '8.0'}
             </span>
+            <span class="text-[9px] text-blue-600 font-bold opacity-80 group-hover:underline">Ver Ficha</span>
           </div>
         </div>
       `).join('');
@@ -419,6 +422,19 @@ document.addEventListener('DOMContentLoaded', () => {
       console.warn('Error al cargar historial de análisis:', err);
     }
   }
+
+  window.verAnalisisHistorial = function(idx) {
+    if (window.cachedAnalysisHistory && window.cachedAnalysisHistory[idx]) {
+      const item = window.cachedAnalysisHistory[idx];
+      const resJson = typeof item.resultado_json === 'string'
+        ? JSON.parse(item.resultado_json)
+        : item.resultado_json;
+      renderAnalysisResult(resJson, item.imagen_url);
+      if (resultsContainer) {
+        resultsContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   loadAnalysisHistory();
 });

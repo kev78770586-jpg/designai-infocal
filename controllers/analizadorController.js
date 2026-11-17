@@ -6,6 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const { AnalisisDiseno, HistorialActividad, Proyecto } = require('../models');
 const aiService = require('../services/aiService');
+const memoryHistory = require('../services/memoryHistory');
 
 /**
  * Procesa y evalúa un diseño gráfico subido por el estudiante
@@ -103,6 +104,18 @@ async function evaluarDiseno(req, res) {
       };
     }
 
+    // Guardar siempre copia en memoria para disponibilidad inmediata
+    memoryHistory.addAnalisis({
+      id: nuevoRegistro.id,
+      usuario_id: usuario.id,
+      titulo_diseno: (titulo_diseno || 'Diseño Gráfico').trim(),
+      tipo_diseno: tipo_diseno || 'afiche',
+      imagen_url: imagenUrl,
+      puntaje_general: resultadoIA.puntaje_general,
+      resultado_json: resultadoIA,
+      creado_en: nuevoRegistro.creado_en || new Date()
+    });
+
     return res.status(201).json({
       exito: true,
       mensaje: '¡Análisis de diseño completado exitosamente!',
@@ -132,8 +145,20 @@ async function getHistorialAnalisis(req, res) {
         order: [['creado_en', 'DESC']],
         limit: 20
       });
+      // Si no hay específicos del usuario, traer los últimos globales
+      if (registros.length === 0) {
+        registros = await AnalisisDiseno.findAll({
+          order: [['creado_en', 'DESC']],
+          limit: 20
+        });
+      }
     } catch (dbErr) {
-      console.warn('⚠️ [analizadorController.getHistorial] DB offline');
+      console.warn('⚠️ [analizadorController.getHistorial] DB offline, usando memoria');
+    }
+
+    // Si la BD no arrojó registros, usar el almacén en memoria
+    if (registros.length === 0) {
+      registros = memoryHistory.getAnalisis(usuario.id);
     }
 
     return res.json({

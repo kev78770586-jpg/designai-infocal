@@ -461,25 +461,51 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      historyContainer.innerHTML = data.tipografias.map(item => `
-        <div class="p-3.5 hover:bg-slate-50 rounded-2xl transition border border-slate-100">
+      window.cachedTypographyHistory = data.tipografias;
+
+      historyContainer.innerHTML = data.tipografias.map((item, idx) => `
+        <div onclick="verTipografiaHistorial(${idx})" class="p-3.5 hover:bg-purple-50/70 rounded-2xl transition border border-slate-100 hover:border-purple-300 cursor-pointer group shadow-sm">
           <div class="flex items-center justify-between mb-1">
             <div class="flex items-center space-x-2 truncate">
-              ${item.imagen_url ? `<img src="${item.imagen_url}" class="w-5 h-5 rounded object-cover border border-slate-200">` : '<span>🔤</span>'}
+              ${item.imagen_url ? `<img src="${item.imagen_url}" class="w-6 h-6 rounded object-cover border border-slate-200">` : '<span>🔤</span>'}
               <span class="text-[10px] font-bold uppercase text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md truncate">
-                ${item.tipo_proyecto}
+                ${item.tipo_proyecto || 'Diseño'}
               </span>
             </div>
             <span class="text-[10px] text-slate-400 flex-shrink-0">${new Date(item.creado_en).toLocaleDateString('es-BO')}</span>
           </div>
-          <h4 class="text-xs font-bold text-slate-800">${item.fuente_titulo} + ${item.fuente_cuerpo}</h4>
-          <p class="text-[11px] text-slate-500 mt-0.5 truncate">${item.estilo_deseado}</p>
+          <h4 class="text-xs font-bold text-slate-800 group-hover:text-purple-700 transition-colors">${item.fuente_titulo} + ${item.fuente_cuerpo}</h4>
+          <p class="text-[11px] text-slate-500 mt-0.5 truncate">${item.estilo_deseado || 'Combinación armónica'}</p>
+          <div class="text-right mt-1.5">
+            <span class="text-[9px] text-purple-600 font-bold opacity-80 group-hover:underline">Ver Ficha y PDF</span>
+          </div>
         </div>
       `).join('');
     } catch (err) {
       console.warn('Error al cargar historial tipográfico:', err);
     }
   }
+
+  window.verTipografiaHistorial = function(idx) {
+    if (window.cachedTypographyHistory && window.cachedTypographyHistory[idx]) {
+      const item = window.cachedTypographyHistory[idx];
+      const resultado = item.resultado_json || {
+        fuente_titulo: item.fuente_titulo,
+        categoria_titulo: 'Display / Titular',
+        fuente_cuerpo: item.fuente_cuerpo,
+        categoria_cuerpo: 'Lectura Continua',
+        fuente_acento: item.fuente_acento,
+        justificacion_combinacion: item.justificacion_combinacion,
+        reglas_jerarquia: item.reglas_jerarquia,
+        enlaces_google_fonts: item.enlaces_google_fonts,
+        consejos_diseno: 'Prioriza siempre la jerarquía y legibilidad en tus piezas de diseño.'
+      };
+      renderTypographyResult(resultado, item.imagen_url);
+      if (resultsContainer) {
+        resultsContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   loadTypographyHistory();
 });

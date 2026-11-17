@@ -391,22 +391,40 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      historyContainer.innerHTML = data.evaluaciones.map(item => `
-        <div class="flex items-center space-x-3 p-3 hover:bg-slate-50 rounded-2xl transition border border-slate-100">
-          <img src="${item.imagen_url}" alt="${item.titulo_pantalla}" class="w-12 h-12 object-cover rounded-xl border border-slate-200">
+      window.cachedUIUXHistory = data.evaluaciones;
+
+      historyContainer.innerHTML = data.evaluaciones.map((item, idx) => `
+        <div onclick="verUIUXHistorial(${idx})" class="flex items-center space-x-3 p-3 hover:bg-emerald-50/70 rounded-2xl transition border border-slate-100 hover:border-emerald-300 cursor-pointer group shadow-sm">
+          <img src="${item.imagen_url}" alt="${item.titulo_pantalla}" class="w-12 h-12 object-cover rounded-xl border border-slate-200 group-hover:scale-105 transition-transform flex-shrink-0">
           <div class="flex-1 min-w-0">
-            <h4 class="text-xs font-bold text-slate-800 truncate">${item.titulo_pantalla}</h4>
+            <h4 class="text-xs font-bold text-slate-800 truncate group-hover:text-emerald-700 transition-colors">${item.titulo_pantalla}</h4>
             <span class="text-[10px] text-slate-400 uppercase tracking-wider">${item.tipo_dispositivo}</span>
           </div>
-          <span class="px-2 py-0.5 rounded-lg text-xs font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200">
-            ${item.puntaje_usabilidad || '8.5'}
-          </span>
+          <div class="text-right flex-shrink-0">
+            <span class="px-2 py-0.5 rounded-lg text-xs font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200 block">
+              ${item.puntaje_usabilidad || '8.5'}
+            </span>
+            <span class="text-[9px] text-emerald-600 font-bold opacity-80 group-hover:underline">Ver Ficha</span>
+          </div>
         </div>
       `).join('');
     } catch (err) {
       console.warn('Error al cargar historial UI/UX:', err);
     }
   }
+
+  window.verUIUXHistorial = function(idx) {
+    if (window.cachedUIUXHistory && window.cachedUIUXHistory[idx]) {
+      const item = window.cachedUIUXHistory[idx];
+      const resJson = typeof item.resultado_json === 'string'
+        ? JSON.parse(item.resultado_json)
+        : item.resultado_json;
+      renderUIUXResult(resJson, item.imagen_url);
+      if (resultsContainer) {
+        resultsContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   loadUIUXHistory();
 });

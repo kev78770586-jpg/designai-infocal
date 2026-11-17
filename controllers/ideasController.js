@@ -4,6 +4,7 @@
  */
 const { IdeaConcepto, HistorialActividad } = require('../models');
 const aiService = require('../services/aiService');
+const memoryHistory = require('../services/memoryHistory');
 
 /**
  * Genera propuestas conceptuales a partir de un brief creativo
@@ -63,6 +64,15 @@ async function generarIdeas(req, res) {
       };
     }
 
+    memoryHistory.addIdea({
+      id: nuevoRegistro.id,
+      usuario_id: usuario.id,
+      prompt_idea: brief.trim(),
+      categoria: categoria || 'Branding / Campaña Gráfica',
+      resultado_json: resultadoIA,
+      creado_en: nuevoRegistro.creado_en || new Date()
+    });
+
     return res.status(201).json({
       exito: true,
       mensaje: '¡Propuestas conceptuales generadas exitosamente!',
@@ -91,8 +101,18 @@ async function getHistorialIdeas(req, res) {
         order: [['creado_en', 'DESC']],
         limit: 20
       });
+      if (registros.length === 0) {
+        registros = await IdeaConcepto.findAll({
+          order: [['creado_en', 'DESC']],
+          limit: 20
+        });
+      }
     } catch (dbErr) {
       console.warn('⚠️ [ideasController.getHistorial] DB offline');
+    }
+
+    if (registros.length === 0) {
+      registros = memoryHistory.getIdeas(usuario.id);
     }
 
     return res.json({

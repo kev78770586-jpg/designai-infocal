@@ -463,19 +463,24 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      historyContainer.innerHTML = data.paletas.map(item => {
+      window.cachedPaletteHistory = data.paletas;
+
+      historyContainer.innerHTML = data.paletas.map((item, idx) => {
         const colores = item.colores_hex_rgb || [];
         return `
-          <div class="p-3.5 hover:bg-slate-50 rounded-2xl transition border border-slate-100 space-y-2">
+          <div onclick="verPaletaHistorial(${idx})" class="p-3.5 hover:bg-indigo-50/70 rounded-2xl transition border border-slate-100 hover:border-indigo-300 space-y-2 cursor-pointer group shadow-sm">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-2 truncate">
-                ${item.imagen_url ? `<img src="${item.imagen_url}" class="w-5 h-5 rounded object-cover border border-slate-200">` : '<span>🎨</span>'}
-                <h4 class="text-xs font-bold text-slate-800 truncate">${item.nombre_paleta}</h4>
+                ${item.imagen_url ? `<img src="${item.imagen_url}" class="w-6 h-6 rounded object-cover border border-slate-200">` : '<span>🎨</span>'}
+                <h4 class="text-xs font-bold text-slate-800 truncate group-hover:text-indigo-700 transition-colors">${item.nombre_paleta}</h4>
               </div>
               <span class="text-[10px] text-slate-400 flex-shrink-0">${new Date(item.creado_en).toLocaleDateString('es-BO')}</span>
             </div>
-            <div class="flex rounded-lg overflow-hidden h-5 w-full shadow-inner">
+            <div class="flex rounded-lg overflow-hidden h-5 w-full shadow-inner border border-slate-200/50">
               ${colores.map(c => `<div class="flex-1 h-full" style="background-color: ${c.hex};" title="${c.nombre} (${c.hex})"></div>`).join('')}
+            </div>
+            <div class="text-right">
+              <span class="text-[9px] text-indigo-600 font-bold opacity-80 group-hover:underline">Ver Ficha y PDF</span>
             </div>
           </div>
         `;
@@ -484,6 +489,24 @@ document.addEventListener('DOMContentLoaded', () => {
       console.warn('Error al cargar historial de paletas:', err);
     }
   }
+
+  window.verPaletaHistorial = function(idx) {
+    if (window.cachedPaletteHistory && window.cachedPaletteHistory[idx]) {
+      const item = window.cachedPaletteHistory[idx];
+      const resultado = item.resultado_json || {
+        nombre_paleta: item.nombre_paleta,
+        concepto_sintesis: item.concepto,
+        emocion_asociada: item.emocion_estilo,
+        colores: item.colores_hex_rgb,
+        evaluacion_wcag: item.evaluacion_wcag,
+        consejos_aplicacion: item.consejos_aplicacion
+      };
+      renderPaletteResult(resultado, item.imagen_url);
+      if (resultsContainer) {
+        resultsContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   loadPaletteHistory();
 });

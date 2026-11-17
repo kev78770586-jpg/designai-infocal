@@ -4,6 +4,7 @@
  */
 const { PaletaColor, HistorialActividad } = require('../models');
 const aiService = require('../services/aiService');
+const memoryHistory = require('../services/memoryHistory');
 
 /**
  * Genera una paleta de colores y evalúa ratios de contraste WCAG
@@ -64,6 +65,18 @@ async function generarPaleta(req, res) {
         creado_en: new Date()
       };
     }
+
+    // Almacenamiento en memoria para contingencia
+    memoryHistory.addPaleta({
+      id: nuevaPaleta.id,
+      usuario_id: usuario.id,
+      nombre_paleta: resultadoIA.nombre_paleta,
+      colores_hex_rgb: resultadoIA.colores,
+      evaluacion_wcag: resultadoIA.evaluacion_wcag,
+      consejos_aplicacion: resultadoIA.consejos_aplicacion,
+      resultado_json: resultadoIA,
+      creado_en: nuevaPaleta.creado_en || new Date()
+    });
 
     return res.status(201).json({
       exito: true,
@@ -146,6 +159,18 @@ async function extraerPaletaImagen(req, res) {
       };
     }
 
+    memoryHistory.addPaleta({
+      id: nuevaPaleta.id,
+      usuario_id: usuario.id,
+      nombre_paleta: resultadoIA.nombre_paleta,
+      imagen_url: imagenUrl,
+      colores_hex_rgb: resultadoIA.colores,
+      evaluacion_wcag: resultadoIA.evaluacion_wcag,
+      consejos_aplicacion: resultadoIA.consejos_aplicacion,
+      resultado_json: resultadoIA,
+      creado_en: nuevaPaleta.creado_en || new Date()
+    });
+
     return res.status(201).json({
       exito: true,
       mensaje: '¡Paleta de colores extraída y evaluada exitosamente!',
@@ -175,8 +200,18 @@ async function getHistorialPaletas(req, res) {
         order: [['creado_en', 'DESC']],
         limit: 20
       });
+      if (registros.length === 0) {
+        registros = await PaletaColor.findAll({
+          order: [['creado_en', 'DESC']],
+          limit: 20
+        });
+      }
     } catch (dbErr) {
       console.warn('⚠️ [coloresController.getHistorial] DB offline');
+    }
+
+    if (registros.length === 0) {
+      registros = memoryHistory.getPaletas(usuario.id);
     }
 
     return res.json({

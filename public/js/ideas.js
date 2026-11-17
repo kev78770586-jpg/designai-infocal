@@ -267,21 +267,39 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      historyContainer.innerHTML = data.ideas.map(item => `
-        <div class="p-3.5 hover:bg-slate-50 rounded-2xl transition border border-slate-100">
+      window.cachedIdeasHistory = data.ideas;
+
+      historyContainer.innerHTML = data.ideas.map((item, idx) => `
+        <div onclick="verIdeaHistorial(${idx})" class="p-3.5 hover:bg-amber-50/70 rounded-2xl transition border border-slate-100 hover:border-amber-300 cursor-pointer group shadow-sm">
           <div class="flex items-center justify-between mb-1">
-            <span class="text-[10px] font-bold uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">
-              ${item.categoria}
+            <span class="text-[10px] font-bold uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md truncate">
+              ${item.categoria || 'Concepto Creativo'}
             </span>
-            <span class="text-[10px] text-slate-400">${new Date(item.creado_en).toLocaleDateString('es-BO')}</span>
+            <span class="text-[10px] text-slate-400 flex-shrink-0">${new Date(item.creado_en).toLocaleDateString('es-BO')}</span>
           </div>
-          <p class="text-xs font-bold text-slate-800 line-clamp-2">${item.prompt_idea}</p>
+          <p class="text-xs font-bold text-slate-800 line-clamp-2 group-hover:text-amber-800 transition-colors">${item.prompt_idea}</p>
+          <div class="text-right mt-1.5">
+            <span class="text-[9px] text-amber-700 font-bold opacity-80 group-hover:underline">Ver 3 Rutas y PDF</span>
+          </div>
         </div>
       `).join('');
     } catch (err) {
       console.warn('Error al cargar historial de ideas:', err);
     }
   }
+
+  window.verIdeaHistorial = function(idx) {
+    if (window.cachedIdeasHistory && window.cachedIdeasHistory[idx]) {
+      const item = window.cachedIdeasHistory[idx];
+      const resJson = typeof item.resultado_json === 'string'
+        ? JSON.parse(item.resultado_json)
+        : item.resultado_json;
+      renderIdeasResult(resJson, item.prompt_idea);
+      if (resultsContainer) {
+        resultsContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   loadIdeasHistory();
 });
