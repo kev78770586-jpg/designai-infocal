@@ -98,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const res = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ nombre_completo, matricula, email, password, rol })
         });
 
@@ -148,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const res = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ email, password })
         });
 

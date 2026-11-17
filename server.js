@@ -19,11 +19,17 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // =============================================================================
-// MIDDLEWARES GENERALES
+// MIDDLEWARES GENERALES Y CONFIGURACIÓN DE PROXY
 // =============================================================================
 
-// Permitir solicitudes de orígenes cruzados (CORS)
-app.use(cors());
+// Permitir reverse proxies (Railway, Render, Netlify, Cloudflare)
+app.set('trust proxy', 1);
+
+// Permitir solicitudes de orígenes cruzados (CORS) con credenciales
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 
 // Parseo de cuerpos de petición JSON y URL-Encoded
 app.use(express.json({ limit: '20mb' }));
@@ -32,15 +38,18 @@ app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 // Parseo de cookies
 app.use(cookieParser());
 
-// Gestión de sesiones de usuario
+// Gestión de sesiones de usuario con persistencia de cookies en proxy inverso
 app.use(session({
+  name: 'designai_sid',
   secret: process.env.SESSION_SECRET || 'infocal_designai_default_secret_key',
   resave: false,
   saveUninitialized: false,
+  proxy: true,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: 'auto',
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 horas
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días de sesión activa
   }
 }));
 

@@ -24,7 +24,7 @@ let currentUser = null;
 
 async function checkSession() {
   try {
-    const res = await fetch('/api/auth/me');
+    const res = await fetch('/api/auth/me', { credentials: 'include' });
     const data = await res.json();
 
     if (!res.ok || !data.autenticado) {
@@ -64,7 +64,7 @@ function updateUserInterface(user) {
 
 async function loadDashboardStats() {
   try {
-    const res = await fetch('/api/dashboard/stats');
+    const res = await fetch('/api/dashboard/stats', { credentials: 'include' });
     if (!res.ok) return;
 
     const data = await res.json();
@@ -201,7 +201,7 @@ function setupLogout() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
       window.location.href = '/login.html';
     } catch (err) {
       window.location.href = '/login.html';

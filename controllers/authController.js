@@ -93,7 +93,7 @@ async function register(req, res) {
       };
     }
 
-    // Inicializar sesión
+    // Inicializar sesión y asegurar guardado antes de responder
     req.session.usuario = {
       id: nuevoUsuario.id,
       nombre_completo: nuevoUsuario.nombre_completo,
@@ -103,10 +103,15 @@ async function register(req, res) {
       carrera: nuevoUsuario.carrera
     };
 
-    return res.status(201).json({
-      exito: true,
-      mensaje: '¡Registro exitoso! Bienvenido a DesignAI de INFOCAL Santa Cruz.',
-      usuario: req.session.usuario
+    req.session.save((saveErr) => {
+      if (saveErr) {
+        console.warn('⚠️ Error al forzar guardado de sesión en registro:', saveErr.message);
+      }
+      return res.status(201).json({
+        exito: true,
+        mensaje: '¡Registro exitoso! Bienvenido a DesignAI de INFOCAL Santa Cruz.',
+        usuario: req.session.usuario
+      });
     });
   } catch (error) {
     console.error('❌ Error en registro de usuario:', error);
@@ -163,7 +168,7 @@ async function login(req, res) {
       });
     }
 
-    // Establecer datos en la sesión
+    // Establecer datos en la sesión y guardar antes de responder
     req.session.usuario = {
       id: usuario.id,
       nombre_completo: usuario.nombre_completo,
@@ -173,7 +178,7 @@ async function login(req, res) {
       carrera: usuario.carrera
     };
 
-    // Registrar en historial si la BD está activa
+    // Registrar en historial en segundo plano
     HistorialActividad.create({
       usuario_id: usuario.id,
       modulo: 'autenticacion',
@@ -182,10 +187,15 @@ async function login(req, res) {
       referencia_id: usuario.id
     }).catch(() => {});
 
-    return res.json({
-      exito: true,
-      mensaje: `¡Bienvenido de nuevo, ${usuario.nombre_completo}!`,
-      usuario: req.session.usuario
+    req.session.save((saveErr) => {
+      if (saveErr) {
+        console.warn('⚠️ Error al forzar guardado de sesión en login:', saveErr.message);
+      }
+      return res.json({
+        exito: true,
+        mensaje: `¡Bienvenido de nuevo, ${usuario.nombre_completo}!`,
+        usuario: req.session.usuario
+      });
     });
   } catch (error) {
     console.error('❌ Error en login:', error);

@@ -13,7 +13,7 @@ let currentGlobalUser = null;
 
 async function checkGlobalSession() {
   try {
-    const res = await fetch('/api/auth/me');
+    const res = await fetch('/api/auth/me', { credentials: 'include' });
     const data = await res.json();
 
     if (!res.ok || !data.autenticado) {
@@ -72,7 +72,7 @@ function initLogout() {
 
   const doLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
       window.location.href = '/login.html';
     } catch {
       window.location.href = '/login.html';
