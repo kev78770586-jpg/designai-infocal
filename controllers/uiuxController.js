@@ -11,7 +11,7 @@ const aiService = require('../services/aiService');
 async function evaluarInterfaz(req, res) {
   try {
     const usuario = req.session.usuario || { id: 2 };
-    const { titulo_pantalla, tipo_dispositivo, contexto, proyecto_id } = req.body;
+    const { titulo_pantalla, tipo_dispositivo, contexto, tarea_principal, patron_diseno, proyecto_id } = req.body;
 
     if (!req.file) {
       return res.status(400).json({
@@ -24,13 +24,19 @@ async function evaluarInterfaz(req, res) {
     const mimeType = req.file.mimetype;
     const imagenUrl = `/uploads/${req.file.filename}`;
 
+    const contextoCompleto = [
+      contexto,
+      tarea_principal ? `Tarea Clave del Usuario: ${tarea_principal}` : '',
+      patron_diseno ? `Sistema de Diseño: ${patron_diseno}` : ''
+    ].filter(Boolean).join('. ');
+
     // 1. Invocar Gemini
     const resultadoIA = await aiService.evaluarUIUX({
       imagePath,
       mimeType,
       tituloPantalla: titulo_pantalla || 'Interfaz Digital',
       tipoDispositivo: tipo_dispositivo || 'mobile',
-      contexto: contexto || ''
+      contexto: contextoCompleto
     });
 
     // 2. Persistir en MySQL

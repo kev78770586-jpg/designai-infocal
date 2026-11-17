@@ -96,6 +96,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderUIUXResult(resultado, imagenUrl) {
+    const tituloPantalla = document.getElementById('tituloPantalla')?.value || 'Pantalla UI';
+    const tipoDispositivo = document.getElementById('tipoDispositivo')?.value || 'mobile';
+    const tarea = document.getElementById('tareaPrincipal')?.value || 'Interacción del usuario';
+    const fechaActual = new Date().toLocaleDateString('es-BO', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
     const scoreBadge = (score) => {
       const val = parseFloat(score);
       if (val >= 8.5) return 'text-emerald-700 bg-emerald-50 border-emerald-200';
@@ -104,39 +109,95 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     resultsContainer.innerHTML = `
-      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
-        
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+      <!-- BARRA DE ACCIÓN: DESCARGA DE AUDITORÍA UI/UX EN PDF -->
+      <div class="bg-gradient-to-r from-[#002D62] via-emerald-800 to-[#2563EB] p-5 rounded-3xl text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center space-x-3">
+          <span class="text-3xl">📱</span>
           <div>
-            <div class="flex items-center space-x-2 text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1">
-              <span>Auditoría de Usabilidad y Experiencia de Usuario</span>
-              <span>•</span>
-              <span>INFOCAL</span>
+            <h3 class="text-base font-extrabold tracking-tight">Auditoría UI/UX Oficial Generada</h3>
+            <p class="text-xs text-emerald-200">Reporte heurístico de usabilidad, accesibilidad y layout INFOCAL</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <button id="btnDescargarUIUXPDF" type="button"
+            class="flex-1 sm:flex-initial py-2.5 px-4 bg-white hover:bg-emerald-50 text-[#002D62] font-black rounded-xl text-xs shadow-md transition flex items-center justify-center space-x-2">
+            <span>📥</span>
+            <span>Descargar PDF Mejorado</span>
+          </button>
+          <button type="button" onclick="window.print()"
+            class="py-2.5 px-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs transition flex items-center justify-center space-x-1">
+            <span>🖨️</span>
+            <span>Imprimir</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CONTENEDOR EXPORTABLE A PDF -->
+      <div id="fichaUIUXPDF" class="bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-200 space-y-6">
+        
+        <!-- Encabezado Institucional -->
+        <div class="border-b-2 border-[#002D62] pb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center space-x-4">
+            <div class="p-2.5 bg-white rounded-2xl border border-slate-200 shadow-sm max-w-[170px]">
+              <img src="/images/logo-infocal.png" alt="Logotipo Institucional INFOCAL Santa Cruz" class="h-12 w-auto object-contain">
             </div>
-            <h2 class="text-2xl font-extrabold text-[#002D62]">Reporte Heurístico UI/UX</h2>
-            <p class="text-xs text-slate-500 mt-1">Evaluación de interacción digital, affordance y accesibilidad</p>
+            <div>
+              <div class="flex items-center space-x-2 text-[10px] font-extrabold text-emerald-700 uppercase tracking-widest">
+                <span>INFOCAL Santa Cruz</span>
+                <span>•</span>
+                <span>Diseño de Interfaces y Experiencia (UI/UX)</span>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-black text-[#002D62] tracking-tight">Auditoría Heurística de Interfaz</h2>
+              <p class="text-[11px] text-slate-500">Evaluación técnica de affordance, jerarquía interactiva y WCAG</p>
+            </div>
           </div>
           
-          <div class="px-5 py-3 rounded-2xl border ${scoreBadge(resultado.puntaje_usabilidad)} text-center">
-            <span class="block text-3xl font-black">${resultado.puntaje_usabilidad}</span>
-            <span class="text-[10px] font-bold uppercase tracking-wider">Usabilidad General</span>
+          <div class="text-right flex items-center space-x-3 self-end sm:self-auto">
+            <div class="px-5 py-3 rounded-2xl border ${scoreBadge(resultado.puntaje_usabilidad)} text-center">
+              <span class="block text-3xl font-black">${resultado.puntaje_usabilidad}</span>
+              <span class="text-[9px] font-extrabold uppercase tracking-wider">Usabilidad / 10</span>
+            </div>
           </div>
         </div>
 
-        <!-- Vista Previa y Resumen -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="md:col-span-1 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 shadow-inner flex items-center justify-center p-2">
-            <img src="${imagenUrl}" alt="Captura UI" class="max-h-80 w-auto object-contain rounded-xl">
+        <!-- Ficha de Datos de la Pantalla -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/80 text-xs">
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Pantalla</span>
+            <span class="font-extrabold text-[#002D62] truncate block">${tituloPantalla}</span>
           </div>
-          <div class="md:col-span-2 flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Dispositivo</span>
+            <span class="font-semibold text-slate-700 capitalize truncate block">${tipoDispositivo}</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tarea Clave</span>
+            <span class="font-semibold text-slate-700 truncate block">${tarea}</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Fecha Emisión</span>
+            <span class="font-semibold text-slate-700 truncate block">${fechaActual}</span>
+          </div>
+        </div>
+
+        <!-- Vista Previa de Captura y Diagnóstico Heurístico -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+          <div class="md:col-span-1 rounded-2xl overflow-hidden border-2 border-slate-200 bg-slate-50 p-2 shadow-inner text-center">
+            <img src="${imagenUrl}" alt="Captura de interfaz" class="max-h-80 w-auto object-contain mx-auto rounded-xl">
+            <span class="inline-block mt-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Interfaz Auditada</span>
+          </div>
+          <div class="md:col-span-2 space-y-4">
             <div>
-              <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Resumen Diagnóstico</h3>
-              <p class="text-xs text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">
+              <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
+                <span>🔍</span>
+                <span>Diagnóstico de Usabilidad y Arquitectura Visual</span>
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
                 ${resultado.resumen_diagnostico}
               </p>
             </div>
             
-            <div class="grid grid-cols-3 gap-3 mt-4">
+            <div class="grid grid-cols-3 gap-3">
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
                 <span class="text-[10px] font-bold text-slate-500 block uppercase">Distribución</span>
                 <span class="text-base font-extrabold text-[#002D62]">${resultado.puntaje_distribucion} / 10</span>
@@ -157,27 +218,30 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
             <span class="text-xs font-bold text-slate-700 block mb-1">📐 Retícula y Layout</span>
-            <p class="text-xs text-slate-500 leading-relaxed">${resultado.analisis_distribucion}</p>
+            <p class="text-xs text-slate-600 leading-relaxed">${resultado.analisis_distribucion}</p>
           </div>
 
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-            <span class="text-xs font-bold text-slate-700 block mb-1">👁️ Escaneabilidad y Textos</span>
-            <p class="text-xs text-slate-500 leading-relaxed">${resultado.analisis_legibilidad}</p>
+            <span class="text-xs font-bold text-slate-700 block mb-1">👁️ Escaneabilidad y Microcopy</span>
+            <p class="text-xs text-slate-600 leading-relaxed">${resultado.analisis_legibilidad}</p>
           </div>
 
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-            <span class="text-xs font-bold text-slate-700 block mb-1">👆 Toques y Affordance</span>
-            <p class="text-xs text-slate-500 leading-relaxed">${resultado.analisis_accesibilidad}</p>
+            <span class="text-xs font-bold text-slate-700 block mb-1">👆 Zonas de Toque y Affordance</span>
+            <p class="text-xs text-slate-600 leading-relaxed">${resultado.analisis_accesibilidad}</p>
           </div>
         </div>
 
         <!-- Hallazgos y Acciones -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
           <div>
-            <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-3">✅ Aciertos de Usabilidad Detectados</h4>
+            <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-3 flex items-center space-x-1.5">
+              <span>✅</span>
+              <span>Aciertos Heurísticos Detectados</span>
+            </h4>
             <ul class="space-y-2">
               ${(resultado.hallazgos_positivos || []).map(h => `
-                <li class="flex items-start space-x-2 text-xs text-slate-700 bg-emerald-50/60 p-2.5 rounded-xl border border-emerald-100">
+                <li class="flex items-start space-x-2 text-xs text-slate-700 bg-emerald-50/70 p-2.5 rounded-xl border border-emerald-200/60">
                   <span class="text-emerald-600 font-bold">•</span>
                   <span>${h}</span>
                 </li>
@@ -186,10 +250,13 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
 
           <div>
-            <h4 class="text-xs font-bold text-blue-900 uppercase tracking-wider mb-3">🛠️ Recomendaciones Accionables</h4>
+            <h4 class="text-xs font-bold text-blue-900 uppercase tracking-wider mb-3 flex items-center space-x-1.5">
+              <span>🛠️</span>
+              <span>Recomendaciones Accionables de Optimización</span>
+            </h4>
             <ul class="space-y-2">
               ${(resultado.recomendaciones_accionables || []).map(r => `
-                <li class="flex items-start space-x-2 text-xs text-slate-700 bg-blue-50/60 p-2.5 rounded-xl border border-blue-100">
+                <li class="flex items-start space-x-2 text-xs text-slate-700 bg-blue-50/70 p-2.5 rounded-xl border border-blue-200/60">
                   <span class="text-blue-600 font-bold">•</span>
                   <span>${r}</span>
                 </li>
@@ -198,8 +265,61 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
 
+        <!-- Firmas Oficiales para el PDF -->
+        <div class="pt-6 border-t border-slate-200 mt-6 grid grid-cols-2 gap-8 text-center">
+          <div>
+            <div class="border-b border-slate-400 w-3/4 mx-auto mb-2 h-8"></div>
+            <p class="text-[11px] font-bold text-[#002D62]">Auditor UI/UX / Jurado INFOCAL</p>
+            <p class="text-[10px] text-slate-400">DesignAI - INFOCAL Santa Cruz</p>
+          </div>
+          <div>
+            <div class="border-b border-slate-400 w-3/4 mx-auto mb-2 h-8"></div>
+            <p class="text-[11px] font-bold text-[#002D62]">Estudiante / Diseñador UI/UX</p>
+            <p class="text-[10px] text-slate-400">Carrera de Diseño Gráfico</p>
+          </div>
+        </div>
+
       </div>
     `;
+
+    // Asignar evento al botón de descarga PDF
+    const btnUIUXPDF = document.getElementById('btnDescargarUIUXPDF');
+    if (btnUIUXPDF) {
+      btnUIUXPDF.addEventListener('click', () => {
+        descargarFichaUIUXPDF(tituloPantalla);
+      });
+    }
+  }
+
+  // Función para exportar Ficha UI/UX a PDF institucional
+  function descargarFichaUIUXPDF(tituloPantalla) {
+    const elemento = document.getElementById('fichaUIUXPDF');
+    if (!elemento) return;
+
+    const nombreLimpio = (tituloPantalla || 'UI_UX').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const opt = {
+      margin:       [8, 8, 8, 8],
+      filename:     `Ficha_UIUX_INFOCAL_${nombreLimpio}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    if (window.html2pdf) {
+      const btn = document.getElementById('btnDescargarUIUXPDF');
+      const originalText = btn ? btn.innerHTML : '';
+      if (btn) btn.innerHTML = `<span>⏳ Generando Auditoría PDF...</span>`;
+      window.html2pdf().set(opt).from(elemento).save().then(() => {
+        if (btn) btn.innerHTML = originalText;
+      }).catch(err => {
+        console.error('Error al generar PDF UI/UX:', err);
+        if (btn) btn.innerHTML = originalText;
+        window.print();
+      });
+    } else {
+      window.print();
+    }
+  }
   }
 
   async function loadUIUXHistory() {

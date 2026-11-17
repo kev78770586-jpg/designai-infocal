@@ -61,6 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const tipo_proyecto = document.getElementById('tipoProyecto').value;
       const estilo_deseado = document.getElementById('estiloDeseado').value;
+      const jerarquia = document.getElementById('jerarquiaTipografia')?.value || '';
+      const densidad = document.getElementById('densidadTipografia')?.value || '';
       const contexto = document.getElementById('contextoTipografia').value;
 
       try {
@@ -77,7 +79,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const res = await fetch('/api/tipografia/recomendar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tipo_proyecto, estilo_deseado, contexto })
+          body: JSON.stringify({
+            tipo_proyecto,
+            estilo_deseado,
+            contexto: [
+              contexto,
+              jerarquia ? `Jerarquía: ${jerarquia}` : '',
+              densidad ? `Densidad: ${densidad}` : ''
+            ].filter(Boolean).join('. ')
+          })
         });
 
         const data = await res.json();
@@ -173,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderTypographyResult(res, imagenUrl = null) {
     const jerarquia = res.reglas_jerarquia || {};
     const links = res.enlaces_google_fonts || [];
+    const fechaActual = new Date().toLocaleDateString('es-BO', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
     // Inyectar dinámicamente Google Fonts en el DOM para previsualización real
     if (res.fuente_titulo) {
@@ -183,30 +194,64 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     resultsContainer.innerHTML = `
-      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
-        
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+      <!-- BARRA DE ACCIÓN: DESCARGA DE FICHA TIPOGRÁFICA EN PDF -->
+      <div class="bg-gradient-to-r from-[#002D62] via-purple-800 to-[#7C3AED] p-5 rounded-3xl text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center space-x-3">
+          <span class="text-3xl">🔤</span>
           <div>
-            <div class="flex items-center space-x-2 text-xs font-bold text-purple-600 uppercase tracking-widest mb-1">
-              <span>${imagenUrl ? 'Tipografía Identificada desde Imagen' : 'Emparejamiento Recomendado'}</span>
-              <span>•</span>
-              <span>INFOCAL</span>
-            </div>
-            <h2 class="text-2xl font-extrabold text-[#002D62]">${res.fuente_titulo} + ${res.fuente_cuerpo}</h2>
-            <p class="text-xs text-slate-500 mt-1">Combinación optimizada por contraste y proporciones formales</p>
+            <h3 class="text-base font-extrabold tracking-tight">Ficha Tipográfica Oficial Generada</h3>
+            <p class="text-xs text-purple-200">Especificación de fuentes, jerarquía visual y escalado INFOCAL</p>
           </div>
-          <span class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-purple-50 text-purple-800 border border-purple-200">
-            ${res.categoria_titulo || 'Sans / Serif'}
-          </span>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <button id="btnDescargarTypoPDF" type="button"
+            class="flex-1 sm:flex-initial py-2.5 px-4 bg-white hover:bg-purple-50 text-[#002D62] font-black rounded-xl text-xs shadow-md transition flex items-center justify-center space-x-2">
+            <span>📥</span>
+            <span>Descargar PDF Mejorado</span>
+          </button>
+          <button type="button" onclick="window.print()"
+            class="py-2.5 px-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs transition flex items-center justify-center space-x-1">
+            <span>🖨️</span>
+            <span>Imprimir</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CONTENEDOR EXPORTABLE A PDF -->
+      <div id="fichaTypoPDF" class="bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-200 space-y-6">
+        
+        <!-- Encabezado Institucional -->
+        <div class="border-b-2 border-[#002D62] pb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center space-x-4">
+            <div class="p-2.5 bg-white rounded-2xl border border-slate-200 shadow-sm max-w-[170px]">
+              <img src="/images/logo-infocal.png" alt="Logotipo Institucional INFOCAL Santa Cruz" class="h-12 w-auto object-contain">
+            </div>
+            <div>
+              <div class="flex items-center space-x-2 text-[10px] font-extrabold text-purple-700 uppercase tracking-widest">
+                <span>INFOCAL Santa Cruz</span>
+                <span>•</span>
+                <span>Dirección de Arte y Tipografía</span>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-black text-[#002D62] tracking-tight">${res.fuente_titulo} + ${res.fuente_cuerpo}</h2>
+              <p class="text-[11px] text-slate-500">Combinación tipográfica estructurada con reglas de escala y espaciado</p>
+            </div>
+          </div>
+          
+          <div class="text-right">
+            <span class="inline-block px-3.5 py-1.5 rounded-xl text-xs font-bold bg-purple-50 text-purple-800 border border-purple-200">
+              ${res.categoria_titulo || 'Sans / Serif'}
+            </span>
+            <span class="block text-[10px] text-slate-400 mt-1">${fechaActual}</span>
+          </div>
         </div>
 
         ${imagenUrl ? `
           <!-- Imagen de Referencia de la que se identificó la tipografía -->
           <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 flex flex-col sm:flex-row items-center gap-4">
-            <img src="${imagenUrl}" alt="Imagen de referencia tipográfica" class="w-32 h-24 object-cover rounded-xl border border-slate-200 shadow-sm flex-shrink-0">
+            <img src="${imagenUrl}" alt="Imagen analizada" class="w-36 h-28 object-cover rounded-xl border border-slate-300 shadow-sm flex-shrink-0">
             <div class="text-xs text-slate-600">
-              <span class="font-bold text-[#002D62] block mb-1">📷 Imagen de Referencia Analizada</span>
-              <p>La IA examinó el estilo visual de la imagen, emparejando la fuente "${res.fuente_titulo}" disponible en Google Fonts como homóloga directa para titulares y "${res.fuente_cuerpo}" para cuerpo de texto.</p>
+              <span class="font-bold text-[#002D62] block mb-1">📷 Imagen de Referencia Tipográfica Analizada</span>
+              <p>La IA reconoció los rasgos formales (serifas, peso visual y altura de x) de la pieza y seleccionó "${res.fuente_titulo}" en Google Fonts para títulos y "${res.fuente_cuerpo}" para cuerpo de texto.</p>
             </div>
           </div>
         ` : ''}
@@ -222,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </h3>
             <p class="text-xs text-slate-500 mb-3">${res.categoria_titulo || 'Clasificación principal'}</p>
             <div class="p-3 bg-white rounded-xl border border-slate-200/60 text-sm text-slate-800" style="font-family: '${res.fuente_titulo}', sans-serif;">
-              "El diseño no es solo cómo se ve, es cómo funciona."
+              "El diseño gráfico no decora: comunica y estructura el pensamiento."
             </div>
           </div>
 
@@ -235,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </h3>
             <p class="text-xs text-slate-500 mb-3">${res.categoria_cuerpo || 'Clasificación secundaria'}</p>
             <div class="p-3 bg-white rounded-xl border border-slate-200/60 text-xs text-slate-600 leading-relaxed" style="font-family: '${res.fuente_cuerpo}', sans-serif;">
-              La legibilidad en bloques de lectura continuos depende de la altura de la x y de una apertura generosa de los caracteres.
+              La legibilidad en bloques continuos depende de un adecuado interletrado, apertura de contraformas y proporción equilibrada con el interlineado.
             </div>
           </div>
         </div>
@@ -288,6 +333,62 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="font-bold text-blue-300 uppercase tracking-wider block mb-1">🎓 Buenas Prácticas Tipográficas INFOCAL:</span>
           <p class="leading-relaxed text-blue-100">${res.consejos_diseno}</p>
         </div>
+
+        <!-- Firmas Oficiales para el PDF -->
+        <div class="pt-6 border-t border-slate-200 mt-6 grid grid-cols-2 gap-8 text-center">
+          <div>
+            <div class="border-b border-slate-400 w-3/4 mx-auto mb-2 h-8"></div>
+            <p class="text-[11px] font-bold text-[#002D62]">Docente de Tipografía y Editorial</p>
+            <p class="text-[10px] text-slate-400">DesignAI - INFOCAL Santa Cruz</p>
+          </div>
+          <div>
+            <div class="border-b border-slate-400 w-3/4 mx-auto mb-2 h-8"></div>
+            <p class="text-[11px] font-bold text-[#002D62]">Estudiante / Diseñador Gráfico</p>
+            <p class="text-[10px] text-slate-400">Carrera de Diseño Gráfico</p>
+          </div>
+        </div>
+
+      </div>
+    `;
+
+    // Asignar evento al botón de descarga PDF
+    const btnTypoPDF = document.getElementById('btnDescargarTypoPDF');
+    if (btnTypoPDF) {
+      btnTypoPDF.addEventListener('click', () => {
+        descargarFichaTypoPDF(res.fuente_titulo);
+      });
+    }
+  }
+
+  // Función para exportar la Ficha Tipográfica a PDF institucional
+  function descargarFichaTypoPDF(fuenteTitulo) {
+    const elemento = document.getElementById('fichaTypoPDF');
+    if (!elemento) return;
+
+    const nombreLimpio = (fuenteTitulo || 'Tipografia').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const opt = {
+      margin:       [8, 8, 8, 8],
+      filename:     `Ficha_Tipografica_INFOCAL_${nombreLimpio}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    if (window.html2pdf) {
+      const btn = document.getElementById('btnDescargarTypoPDF');
+      const originalText = btn ? btn.innerHTML : '';
+      if (btn) btn.innerHTML = `<span>⏳ Generando PDF...</span>`;
+      window.html2pdf().set(opt).from(elemento).save().then(() => {
+        if (btn) btn.innerHTML = originalText;
+      }).catch(err => {
+        console.error('Error al generar PDF tipográfico:', err);
+        if (btn) btn.innerHTML = originalText;
+        window.print();
+      });
+    } else {
+      window.print();
+    }
+  }
 
       </div>
     `;

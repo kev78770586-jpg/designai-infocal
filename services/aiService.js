@@ -101,17 +101,20 @@ async function analizarDisenoGrafico({ imagePath, mimeType, titulo, tipoDiseno, 
   }
 
   const prompt = `
-Actúa como un profesor senior y jurado calificador de la carrera de Diseño Gráfico de INFOCAL Santa Cruz.
-Estás evaluando la siguiente pieza gráfica creada por un estudiante:
+Actúa como un profesor senior y jurado calificador de la carrera de Diseño Gráfico y Comunicación Visual de INFOCAL Santa Cruz.
+Estás realizando una evaluación pedagógica rigurosa y detallada de la siguiente pieza gráfica creada por un estudiante:
 - Título del proyecto: "${titulo || 'Diseño Gráfico'}"
-- Tipo de pieza: "${tipoDiseno || 'Afiche publicitario'}"
-- Contexto y objetivos del estudiante: "${contexto || 'Sin contexto adicional proporcionado'}"
+- Soporte / Formato del diseño: "${tipoDiseno || 'Afiche publicitario'}"
+- Contexto, público objetivo y detalles del estudiante: "${contexto || 'Sin contexto adicional proporcionado'}"
 
-Instrucciones de evaluación rigurosa:
-1. Evalúa Composición (regla de tercios, equilibrio simétrico/asimétrico, uso del espacio negativo/en blanco).
-2. Evalúa Jerarquía Visual (recorrido de lectura en Z o F, escala tipográfica, dominancia del punto focal).
-3. Evalúa Contraste Cromático (relación figura/fondo, saturación, legibilidad de textos sobre fondos).
-4. Proporciona puntuaciones objetivas del 1.0 al 10.0 y retroalimentación pedagógica constructiva orientada a la excelencia profesional.
+Criterios de Evaluación Técnica INFOCAL:
+1. Composición y Equilibrio: Evalúa la aplicación de la regla de tercios, proporción áurea, pesos visuales, simetría/asimetría y uso del espacio negativo.
+2. Jerarquía Visual y Orden de Lectura: Analiza si la mirada sigue un recorrido intencional (Z o F), el escalado tipográfico entre H1, H2 y cuerpo, y si el mensaje clave/CTA destaca con claridad.
+3. Contraste Cromático y Legibilidad: Evalúa la relación figura/fondo, saturación, luminancia y si el contraste permite lectura fluida tanto en digital como en impresión.
+4. Adecuación al Público y Tono: Determina si el estilo gráfico conecta genuinamente con el público objetivo definido y transmite el mensaje deseado.
+5. Puntos Fuertes: Enumera al menos 3 aciertos técnicos y creativos concretos del estudiante.
+6. Recomendaciones de Mejora Accionables: Enumera al menos 3 recomendaciones técnicas precisas y accionables (ej. mover un elemento, ajustar tamaño de fuente, incrementar contraste en tal zona, despejar márgenes).
+7. Consejo Pedagógico INFOCAL: Proporciona una reflexión teórica profunda de diseño que enriquezca la formación profesional del estudiante.
 
 Responde estrictamente en formato JSON conforme al esquema definido.
 `;

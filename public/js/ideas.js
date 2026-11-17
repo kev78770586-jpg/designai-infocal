@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const brief = document.getElementById('briefIdea').value;
       const categoria = document.getElementById('categoriaIdea').value;
       const publico_meta = document.getElementById('publicoIdea').value;
+      const emocion = document.getElementById('emocionDetonante')?.value || '';
+      const enfoque = document.getElementById('enfoqueCreativo')?.value || '';
 
       try {
         submitBtn.disabled = true;
@@ -41,7 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const res = await fetch('/api/ideas/generar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ brief, categoria, publico_meta })
+          body: JSON.stringify({
+            brief: `${brief} (Emoción detonante: ${emocion}, Enfoque: ${enfoque})`,
+            categoria,
+            publico_meta
+          })
         });
 
         const data = await res.json();
@@ -75,19 +81,57 @@ document.addEventListener('DOMContentLoaded', () => {
     const palabras = res.palabras_clave || [];
     const propuestas = res.propuestas || [];
     const referentes = res.referencias_movimientos_artisticos || [];
+    const fechaActual = new Date().toLocaleDateString('es-BO', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
     resultsContainer.innerHTML = `
-      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6">
-        
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+      <!-- BARRA DE ACCIÓN: DESCARGA DE DOSSIER CONCEPTUAL EN PDF -->
+      <div class="bg-gradient-to-r from-[#002D62] via-amber-800 to-[#7C3AED] p-5 rounded-3xl text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center space-x-3">
+          <span class="text-3xl">💡</span>
           <div>
-            <div class="flex items-center space-x-2 text-xs font-bold text-amber-600 uppercase tracking-widest mb-1">
-              <span>Propuestas Creativas</span>
-              <span>•</span>
-              <span>INFOCAL</span>
+            <h3 class="text-base font-extrabold tracking-tight">Dossier Conceptual Oficial Generado</h3>
+            <p class="text-xs text-amber-200">3 Rutas de Dirección de Arte, Metáforas Visuales y Referentes INFOCAL</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <button id="btnDescargarIdeasPDF" type="button"
+            class="flex-1 sm:flex-initial py-2.5 px-4 bg-white hover:bg-amber-50 text-[#002D62] font-black rounded-xl text-xs shadow-md transition flex items-center justify-center space-x-2">
+            <span>📥</span>
+            <span>Descargar Dossier en PDF</span>
+          </button>
+          <button type="button" onclick="window.print()"
+            class="py-2.5 px-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs transition flex items-center justify-center space-x-1">
+            <span>🖨️</span>
+            <span>Imprimir</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CONTENEDOR EXPORTABLE A PDF -->
+      <div id="fichaIdeasPDF" class="bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-200 space-y-6">
+        
+        <!-- Encabezado Institucional -->
+        <div class="border-b-2 border-[#002D62] pb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center space-x-4">
+            <div class="p-2.5 bg-white rounded-2xl border border-slate-200 shadow-sm max-w-[170px]">
+              <img src="/images/logo-infocal.png" alt="Logotipo Institucional INFOCAL Santa Cruz" class="h-12 w-auto object-contain">
             </div>
-            <h2 class="text-2xl font-extrabold text-[#002D62]">Dirección de Arte y Conceptos</h2>
-            <p class="text-xs text-slate-500 mt-1">${res.sintesis_brief}</p>
+            <div>
+              <div class="flex items-center space-x-2 text-[10px] font-extrabold text-amber-700 uppercase tracking-widest">
+                <span>INFOCAL Santa Cruz</span>
+                <span>•</span>
+                <span>Dirección de Arte y Creatividad</span>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-black text-[#002D62] tracking-tight">Dossier de Rutas Conceptuales</h2>
+              <p class="text-[11px] text-slate-500">${res.sintesis_brief}</p>
+            </div>
+          </div>
+          
+          <div class="text-right">
+            <span class="inline-block px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+              3 Propuestas de Arte
+            </span>
+            <span class="block text-[10px] text-slate-400 mt-1">${fechaActual}</span>
           </div>
         </div>
 
@@ -151,6 +195,61 @@ document.addEventListener('DOMContentLoaded', () => {
             </ul>
           </div>
         </div>
+
+        <!-- Firmas Oficiales para el PDF -->
+        <div class="pt-6 border-t border-slate-200 mt-6 grid grid-cols-2 gap-8 text-center">
+          <div>
+            <div class="border-b border-slate-400 w-3/4 mx-auto mb-2 h-8"></div>
+            <p class="text-[11px] font-bold text-[#002D62]">Docente de Creatividad y Campañas</p>
+            <p class="text-[10px] text-slate-400">DesignAI - INFOCAL Santa Cruz</p>
+          </div>
+          <div>
+            <div class="border-b border-slate-400 w-3/4 mx-auto mb-2 h-8"></div>
+            <p class="text-[11px] font-bold text-[#002D62]">Estudiante / Diseñador Gráfico</p>
+            <p class="text-[10px] text-slate-400">Carrera de Diseño Gráfico</p>
+          </div>
+        </div>
+
+      </div>
+    `;
+
+    // Asignar evento al botón de descarga PDF
+    const btnIdeasPDF = document.getElementById('btnDescargarIdeasPDF');
+    if (btnIdeasPDF) {
+      btnIdeasPDF.addEventListener('click', () => {
+        descargarFichaIdeasPDF();
+      });
+    }
+  }
+
+  // Función para exportar Dossier a PDF institucional
+  function descargarFichaIdeasPDF() {
+    const elemento = document.getElementById('fichaIdeasPDF');
+    if (!elemento) return;
+
+    const opt = {
+      margin:       [8, 8, 8, 8],
+      filename:     `Dossier_Creativo_INFOCAL.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    if (window.html2pdf) {
+      const btn = document.getElementById('btnDescargarIdeasPDF');
+      const originalText = btn ? btn.innerHTML : '';
+      if (btn) btn.innerHTML = `<span>⏳ Generando Dossier PDF...</span>`;
+      window.html2pdf().set(opt).from(elemento).save().then(() => {
+        if (btn) btn.innerHTML = originalText;
+      }).catch(err => {
+        console.error('Error al generar PDF de ideas:', err);
+        if (btn) btn.innerHTML = originalText;
+        window.print();
+      });
+    } else {
+      window.print();
+    }
+  }
 
       </div>
     `;

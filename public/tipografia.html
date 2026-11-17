@@ -25,6 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style> body { font-family: 'Plus Jakarta Sans', sans-serif; } </style>
 </head>
 <body class="bg-[#F8FAFC] text-[#1E293B] min-h-screen flex flex-col md:flex-row antialiased">
@@ -142,56 +143,96 @@
             
             <!-- MODALIDAD 1: RECOMENDACIÓN POR PROYECTO Y ESTILO -->
             <form id="tipografiaForm" class="space-y-5">
+              <div class="border-b border-slate-100 pb-3">
+                <h3 class="text-xs font-extrabold text-[#002D62] uppercase tracking-wider flex items-center space-x-2">
+                  <span>🔤</span>
+                  <span>Cuestionario de Jerarquía y Personalidad Tipográfica</span>
+                </h3>
+              </div>
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label for="tipoProyecto" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Tipo de Proyecto Gráfico *
+                    1. Soporte / Formato del Proyecto *
                   </label>
                   <select id="tipoProyecto" required
                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
-                    <option value="Revista Editorial / Publicación" selected>Revista Editorial / Publicación</option>
-                    <option value="Sitio Web Corporativo">Sitio Web Corporativo</option>
-                    <option value="Identidad de Marca / Branding">Identidad de Marca / Branding</option>
-                    <option value="Afiche Publicitario / Cartel">Afiche Publicitario / Cartel</option>
-                    <option value="Packaging / Etiqueta de Producto">Packaging / Etiqueta de Producto</option>
-                    <option value="Aplicación Móvil UI">Aplicación Móvil UI</option>
+                    <option value="Revista Editorial / Publicación Impresa" selected>Revista Editorial / Publicación Impresa</option>
+                    <option value="Sitio Web Corporativo y Plataforma Digital">Sitio Web Corporativo / Plataforma Digital</option>
+                    <option value="Identidad de Marca / Logotipo / Papelería">Identidad de Marca / Logotipo</option>
+                    <option value="Afiche Publicitario / Cartelería Urbana">Afiche Publicitario / Cartelería Urbana</option>
+                    <option value="Packaging / Etiqueta de Producto Comercial">Packaging / Etiqueta de Producto</option>
+                    <option value="Aplicación Móvil UI (iOS / Android)">Aplicación Móvil UI (iOS / Android)</option>
                   </select>
                 </div>
 
                 <div>
                   <label for="estiloDeseado" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Estilo o Tono Deseado *
+                    2. Personalidad y Tono Visual *
                   </label>
                   <select id="estiloDeseado" required
                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
-                    <option value="Elegante y Sofisticado (Serif clásico con Sans moderna)" selected>Elegante y Sofisticado</option>
-                    <option value="Moderno, Técnico y Minimalista (Sans geométrica)">Moderno, Técnico y Minimalista</option>
-                    <option value="Editorial Audaz y Creativo (Display con Serif)">Editorial Audaz y Creativo</option>
-                    <option value="Cálido, Artesanal y Humano (Humanista)">Cálido, Artesanal y Humano</option>
-                    <option value="Contundente e Industrial (Grotesco condensado)">Contundente e Industrial</option>
+                    <option value="Elegante y Sofisticado (Serif clásico con Sans moderna)" selected>Elegante y Sofisticado (Serif clásico + Sans)</option>
+                    <option value="Moderno, Técnico y Minimalista (Sans geométrica pura)">Moderno y Tecnológico (Sans geométrica)</option>
+                    <option value="Editorial Audaz y Vanguardista (Display de impacto + Serif)">Editorial Audaz (Display + Serif de lectura)</option>
+                    <option value="Cálido, Artesanal y Humano (Humanista con carácter)">Cálido y Humano (Humanista con calidez)</option>
+                    <option value="Contundente, Firme e Industrial (Grotesco condensado)">Contundente e Industrial (Grotesco)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="jerarquiaTipografia" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    3. Niveles de Jerarquía Requeridos *
+                  </label>
+                  <select id="jerarquiaTipografia"
+                    class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
+                    <option value="3 Niveles: Título H1, Subtítulo H2 y Párrafo de Lectura" selected>3 Niveles (H1 Título, H2 Subtítulo, P Párrafo)</option>
+                    <option value="4 Niveles: Título de Impacto, Subtítulo, Cuerpo y Cita / Acento">4 Niveles (+ Citas y Datos Destacados)</option>
+                    <option value="2 Niveles: Solo Titulares y Microcopy / Botones">2 Niveles (Titular + Botones / CTA)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="densidadTipografia" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    4. Densidad de Texto y Lectura *
+                  </label>
+                  <select id="densidadTipografia"
+                    class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
+                    <option value="Alta Densidad: Textos largos y columnas de lectura prolongada" selected>Alta Densidad (Lectura continua prolongada)</option>
+                    <option value="Media Densidad: Párrafos cortos acompañados de infografías">Media Densidad (Párrafos dinámicos)</option>
+                    <option value="Baja Densidad: Cartel con frases breves y números grandes">Baja Densidad (Impacto rápido / Cartel)</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label for="contextoTipografia" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Contexto Adicional de Lectura
+                  5. Contexto Adicional o Familias Preferidas (Opcional)
                 </label>
-                <input type="text" id="contextoTipografia" placeholder="Ej: Lectura prolongada en pantalla y material impreso a dos columnas..."
+                <input type="text" id="contextoTipografia" placeholder="Ej: Busco una combinación que funcione tanto en pantalla Retina como en papel satinado..."
                   class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none text-sm text-[#1E293B]">
               </div>
 
               <button type="submit"
                 class="w-full py-3.5 px-4 bg-gradient-to-r from-[#002D62] via-purple-800 to-[#7C3AED] hover:opacity-95 text-white font-bold rounded-xl shadow-lg transition-all text-sm flex items-center justify-center space-x-2">
-                <span>✨ Recomendar Combinación Tipográfica</span>
+                <span>✨ Recomendar Combinación y Jerarquía Tipográfica</span>
               </button>
             </form>
 
             <!-- MODALIDAD 2: IDENTIFICAR Y EMPAREJAR DESDE IMAGEN (MULTIMODAL) -->
             <form id="tipografiaImagenForm" class="space-y-5 hidden" enctype="multipart/form-data">
+              <div class="border-b border-slate-100 pb-3">
+                <h3 class="text-xs font-extrabold text-[#002D62] uppercase tracking-wider flex items-center space-x-2">
+                  <span>📷</span>
+                  <span>Identificación Multimodal de Fuentes y Ficha en PDF</span>
+                </h3>
+              </div>
+
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Subir Imagen con Tipografía (Afiche, Portada, Logo, Packaging) *
+                  1. Subir Imagen con Tipografía (Afiche, Portada, Logo, Packaging) *
                 </label>
                 <div class="border-2 border-dashed border-slate-300 hover:border-purple-500 rounded-2xl p-6 text-center cursor-pointer transition bg-slate-50/50 relative">
                   <input type="file" id="imagenTipografia" name="imagen_tipografia" accept="image/jpeg,image/png,image/webp" required
@@ -199,7 +240,7 @@
                   <div class="space-y-2 pointer-events-none">
                     <span class="text-3xl block">🔤</span>
                     <p class="text-xs font-bold text-slate-700">Arrastra tu imagen aquí o haz clic para seleccionarla</p>
-                    <p class="text-[11px] text-slate-400">JPG, PNG o WEBP — La IA identificará la fuente y sugerirá emparejamientos en Google Fonts</p>
+                    <p class="text-[11px] text-slate-400">JPG, PNG o WEBP — La IA identificará la fuente y generará la Ficha en PDF</p>
                   </div>
                 </div>
 
@@ -212,7 +253,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label for="tipoProyectoImagen" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Aplicación Prevista *
+                    2. Aplicación Prevista *
                   </label>
                   <select id="tipoProyectoImagen" name="tipo_proyecto"
                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
@@ -226,7 +267,7 @@
 
                 <div>
                   <label for="estiloDeseadoImagen" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Criterio de Emparejamiento *
+                    3. Criterio de Emparejamiento *
                   </label>
                   <select id="estiloDeseadoImagen" name="estilo_deseado"
                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
@@ -240,7 +281,7 @@
 
               <button type="submit"
                 class="w-full py-3.5 px-4 bg-gradient-to-r from-purple-700 via-indigo-700 to-[#002D62] hover:opacity-95 text-white font-bold rounded-xl shadow-lg transition-all text-sm flex items-center justify-center space-x-2">
-                <span>🔍 Analizar Tipografía de Imagen y Emparejar con IA</span>
+                <span>🔍 Analizar Tipografía, Emparejar y Generar Ficha PDF</span>
               </button>
             </form>
 

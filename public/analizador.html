@@ -25,6 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style> body { font-family: 'Plus Jakarta Sans', sans-serif; } </style>
 </head>
 <body class="bg-[#F8FAFC] text-[#1E293B] min-h-screen flex flex-col md:flex-row antialiased">
@@ -153,38 +154,98 @@
             </div>
           </div>
 
-          <!-- Campos de Contexto del Diseño -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Cuestionario Técnico y Contexto Guiado para la IA -->
+          <div class="border-t border-slate-200/80 pt-5 space-y-4">
+            <h3 class="text-xs font-extrabold text-[#002D62] uppercase tracking-wider flex items-center space-x-2">
+              <span>📋</span>
+              <span>Cuestionario Pedagógico del Proyecto (INFOCAL)</span>
+            </h3>
+
+            <!-- Preguntas 1 y 2: Título y Formato -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="tituloDiseno" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  1. Título del Proyecto Gráfico *
+                </label>
+                <input type="text" id="tituloDiseno" name="titulo_diseno" required placeholder="Ej: Afiche Festival de Jazz Santa Cruz 2026"
+                  class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-sm text-[#1E293B]">
+              </div>
+
+              <div>
+                <label for="tipoDiseno" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  2. Soporte / Formato de Salida *
+                </label>
+                <select id="tipoDiseno" name="tipo_diseno" required
+                  class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
+                  <option value="afiche" selected>Afiche / Cartel Impreso (A3 / Tabloide)</option>
+                  <option value="red_social">Post / Story para Redes Sociales (1080x1080 / 1080x1920)</option>
+                  <option value="editorial">Portada o Maqueta Editorial (Revista / Catálogo / Libro)</option>
+                  <option value="identidad_visual">Identidad Visual / Logotipo / Papelería</option>
+                  <option value="packaging">Packaging / Diseño de Empaque y Etiqueta</option>
+                  <option value="banner_web">Pieza Digital / Banner Web / Pantalla Publicitaria</option>
+                  <option value="otro">Composición Libre / Otro Formato</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Preguntas 3 y 4: Público Objetivo y Tono Visual -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="publicoObjetivo" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  3. Público Objetivo y Rango de Edad *
+                </label>
+                <input type="text" id="publicoObjetivo" name="publico_objetivo" required placeholder="Ej: Jóvenes universitarios cruceños de 18 a 26 años"
+                  class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-sm text-[#1E293B]">
+              </div>
+
+              <div>
+                <label for="tonoEstilo" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  4. Tono y Estilo Visual Deseado *
+                </label>
+                <select id="tonoEstilo" name="tono_estilo" required
+                  class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
+                  <option value="Moderno y Dinámico" selected>Moderno y Dinámico (Juventud, ritmo visual)</option>
+                  <option value="Minimalista y Limpio">Minimalista y Limpio (Espacio negativo, sobriedad)</option>
+                  <option value="Elegante y Sofisticado">Elegante y Sofisticado (Premium, serif clásica)</option>
+                  <option value="Urbano y Disruptivo">Urbano y Disruptivo (Contracultura, alta energía)</option>
+                  <option value="Cálido y Artesanal">Cálido y Artesanal (Identidad regional, texturas)</option>
+                  <option value="Institucional y Académico">Institucional y Riguroso (Corporativo, confianza)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Pregunta 5: Mensaje Central o Llamado a la Acción -->
             <div>
-              <label for="tituloDiseno" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Título de la Pieza Gráfica *
+              <label for="mensajeClave" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                5. Mensaje Central o Llamado a la Acción (CTA) *
               </label>
-              <input type="text" id="tituloDiseno" name="titulo_diseno" required placeholder="Ej: Afiche Festival de Jazz 2026"
+              <input type="text" id="mensajeClave" name="mensaje_clave" required placeholder="Ej: Motivar la compra de entradas antes del 15 de mayo con fecha y lugar claros"
                 class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-sm text-[#1E293B]">
             </div>
 
-            <div>
-              <label for="tipoDiseno" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Tipo de Pieza Gráfica *
-              </label>
-              <select id="tipoDiseno" name="tipo_diseno" required
-                class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
-                <option value="afiche" selected>Afiche Publicitario / Cartel</option>
-                <option value="red_social">Post para Redes Sociales (Instagram / FB)</option>
-                <option value="editorial">Portada o Maqueta Editorial (Revista / Libro)</option>
-                <option value="identidad_visual">Identidad Visual / Logotipo</option>
-                <option value="packaging">Packaging / Diseño de Empaque</option>
-                <option value="otro">Composición Digital / Otro</option>
-              </select>
-            </div>
-          </div>
+            <!-- Preguntas 6 y 7: Aspecto Prioritario e Inquietudes -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="aspectoPrioritario" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  6. Aspecto que Deseas Evaluar con Prioridad *
+                </label>
+                <select id="aspectoPrioritario" name="aspecto_prioritario" required
+                  class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
+                  <option value="Composición y Equilibrio Visual" selected>Equilibrio Compositivo (Regla de tercios y pesos)</option>
+                  <option value="Jerarquía y Orden de Lectura">Jerarquía Tipográfica (Recorrido visual Z/F y escala)</option>
+                  <option value="Contraste Cromático y Legibilidad">Contraste y Legibilidad (Figura-fondo y WCAG)</option>
+                  <option value="Impacto Conceptual Global">Impacto Creativo y Conexión con el Público</option>
+                </select>
+              </div>
 
-          <div>
-            <label for="contextoDiseno" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-              Contexto, Público Objetivo y Objetivos de Comunicación
-            </label>
-            <textarea id="contextoDiseno" name="contexto_diseno" rows="3" placeholder="Describe brevemente a quién va dirigida la pieza, qué mensaje debe comunicar y si sigue alguna línea de marca..."
-              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-sm text-[#1E293B]"></textarea>
+              <div>
+                <label for="dudaEspecifica" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  7. ¿Tienes alguna duda puntual para el jurado? (Opcional)
+                </label>
+                <input type="text" id="dudaEspecifica" name="duda_especifica" placeholder="Ej: ¿Sientes que el texto secundario compite con el logotipo?"
+                  class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-sm text-[#1E293B]">
+              </div>
+            </div>
           </div>
 
           <button type="submit"

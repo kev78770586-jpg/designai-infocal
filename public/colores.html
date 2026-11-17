@@ -25,6 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style> body { font-family: 'Plus Jakarta Sans', sans-serif; } </style>
 </head>
 <body class="bg-[#F8FAFC] text-[#1E293B] min-h-screen flex flex-col md:flex-row antialiased">
@@ -142,40 +143,86 @@
             
             <!-- MODALIDAD 1: GENERAR POR CONCEPTO TEÓRICO -->
             <form id="coloresForm" class="space-y-5">
+              <div class="border-b border-slate-100 pb-3">
+                <h3 class="text-xs font-extrabold text-[#002D62] uppercase tracking-wider flex items-center space-x-2">
+                  <span>🎨</span>
+                  <span>Cuestionario Cromático y Psicológico del Proyecto</span>
+                </h3>
+              </div>
+
               <div>
                 <label for="conceptoColor" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Concepto o Brief del Proyecto *
+                  1. Concepto o Brief del Proyecto *
                 </label>
                 <input type="text" id="conceptoColor" required placeholder="Ej: Café artesanal orgánico de los valles cruceños, tradición y calidez"
                   class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none text-sm text-[#1E293B]">
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label for="publicoColor" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Público Objetivo
+                  <label for="rubroColor" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    2. Sector o Rubro Comercial *
                   </label>
-                  <input type="text" id="publicoColor" placeholder="Ej: Jóvenes profesionales de 20-35 años"
-                    class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none text-sm text-[#1E293B]">
+                  <select id="rubroColor" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
+                    <option value="Gastronomía y Cafetería" selected>Gastronomía y Cafetería</option>
+                    <option value="Tecnología, Startups e Innovación">Tecnología, Startups e Innovación</option>
+                    <option value="Salud, Belleza y Bienestar">Salud, Belleza y Bienestar</option>
+                    <option value="Arte, Cultura y Turismo Cruceño">Arte, Cultura y Turismo Cruceño</option>
+                    <option value="Educación y Formación Técnica">Educación y Formación Técnica</option>
+                    <option value="Moda, Diseño y Creatividad">Moda, Diseño y Creatividad</option>
+                    <option value="Finanzas, Corporativo y Consultoría">Finanzas, Corporativo y Consultoría</option>
+                  </select>
                 </div>
 
                 <div>
                   <label for="emocionColor" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Emoción / Tono Visual
+                    3. Emoción Psicológica Deseada *
                   </label>
-                  <input type="text" id="emocionColor" placeholder="Ej: Rústico moderno, premium y acogedor"
-                    class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none text-sm text-[#1E293B]">
+                  <select id="emocionColor" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
+                    <option value="Confianza, Solidez y Profesionalismo" selected>Confianza, Solidez y Rigor</option>
+                    <option value="Calidez, Cercanía y Tradición">Calidez, Cercanía y Tradición</option>
+                    <option value="Energía, Vitalidad y Audacia">Energía, Vitalidad y Audacia</option>
+                    <option value="Lujo, Sofisticación y Exclusividad">Lujo, Sofisticación y Exclusividad</option>
+                    <option value="Serenidad, Calma y Naturaleza">Serenidad, Calma y Naturaleza</option>
+                    <option value="Innovación, Vanguardia y Futurismo">Innovación, Vanguardia y Futurismo</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="armoniaColor" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    4. Armonía Cromática *
+                  </label>
+                  <select id="armoniaColor" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
+                    <option value="Análoga" selected>Análoga (Fluidez armónica)</option>
+                    <option value="Complementaria">Complementaria (Alto contraste)</option>
+                    <option value="Triádica">Triádica (Equilibrio de 3 puntas)</option>
+                    <option value="Monocromática">Monocromática (Elegancia tonal)</option>
+                    <option value="Tetrádica">Tetrádica / Doble complementario</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="medioColor" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    5. Medio de Salida *
+                  </label>
+                  <select id="medioColor" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
+                    <option value="Pantalla Digital RGB (Web, Apps, Redes)" selected>Digital RGB (Web / App / Redes)</option>
+                    <option value="Impreso Offset / Digital CMYK">Impreso CMYK (Afiches, Folletos)</option>
+                    <option value="Mixto Omnicanal">Mixto Omnicanal (Digital e Impreso)</option>
+                  </select>
                 </div>
 
                 <div>
                   <label for="cantidadColores" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Cantidad de Colores
+                    6. Cantidad de Tonos
                   </label>
                   <select id="cantidadColores"
                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
                     <option value="4">4 Tonos (Minimalista)</option>
-                    <option value="5" selected>5 Tonos (Recomendado)</option>
-                    <option value="6">6 Tonos (Amplia gama)</option>
+                    <option value="5" selected>5 Tonos (Recomendado 60-30-10)</option>
+                    <option value="6">6 Tonos (Gama extendida)</option>
                   </select>
                 </div>
               </div>
@@ -188,9 +235,16 @@
 
             <!-- MODALIDAD 2: EXTRAER DESDE IMAGEN (MULTIMODAL) -->
             <form id="coloresImagenForm" class="space-y-5 hidden" enctype="multipart/form-data">
+              <div class="border-b border-slate-100 pb-3">
+                <h3 class="text-xs font-extrabold text-[#002D62] uppercase tracking-wider flex items-center space-x-2">
+                  <span>📷</span>
+                  <span>Extracción Multimodal y Ficha Técnica en PDF</span>
+                </h3>
+              </div>
+
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Subir Fotografía, Afiche o Ilustración *
+                  1. Subir Fotografía, Afiche o Ilustración de Referencia *
                 </label>
                 <div class="border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-2xl p-6 text-center cursor-pointer transition bg-slate-50/50 relative">
                   <input type="file" id="imagenPaleta" name="imagen_paleta" accept="image/jpeg,image/png,image/webp" required
@@ -198,7 +252,7 @@
                   <div class="space-y-2 pointer-events-none">
                     <span class="text-3xl block">🖼️</span>
                     <p class="text-xs font-bold text-slate-700">Arrastra tu imagen aquí o haz clic para seleccionarla</p>
-                    <p class="text-[11px] text-slate-400">JPG, PNG o WEBP — La IA extraerá los tonos y contrastes</p>
+                    <p class="text-[11px] text-slate-400">JPG, PNG o WEBP — La IA extraerá los tonos y generará la Ficha en PDF</p>
                   </div>
                 </div>
 
@@ -208,23 +262,36 @@
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label for="enfoqueColor" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Criterio de Extracción Cromática *
+                    2. Criterio de Extracción *
                   </label>
                   <select id="enfoqueColor" name="enfoque"
                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
                     <option value="tonos dominantes y armoniosos" selected>Colores Dominantes (Mayor peso visual)</option>
                     <option value="tonos vibrantes y saturados">Tonos Vibrantes y Saturados</option>
                     <option value="tonos pastel, suaves y sutiles">Tonos Pastel y Suaves</option>
-                    <option value="alto contraste para diseño editorial y UI">Máximo Contraste (Para texto y fondo)</option>
+                    <option value="alto contraste para diseño editorial y UI">Máximo Contraste (Lectura y Accesibilidad)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="destinoColorImagen" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    3. Destino de la Paleta *
+                  </label>
+                  <select id="destinoColorImagen" name="destino"
+                    class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
+                    <option value="Identidad de Marca y Logotipo" selected>Identidad de Marca / Logo</option>
+                    <option value="Diseño de Interfaces Web / App">Interfaces Web / Móvil UI</option>
+                    <option value="Afiche Publicitario o Editorial">Afiche o Editorial Impreso</option>
+                    <option value="Packaging y Empaque">Packaging y Empaque</option>
                   </select>
                 </div>
 
                 <div>
                   <label for="cantidadColoresImagen" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Cantidad de Tonos a Extraer
+                    4. Tonos a Extraer
                   </label>
                   <select id="cantidadColoresImagen" name="cantidad"
                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
@@ -237,7 +304,7 @@
 
               <button type="submit"
                 class="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-700 via-purple-700 to-[#002D62] hover:opacity-95 text-white font-bold rounded-xl shadow-lg transition-all text-sm flex items-center justify-center space-x-2">
-                <span>🔍 Extraer Paleta y Evaluar WCAG con IA</span>
+                <span>🔍 Extraer Paleta, Evaluar WCAG y Generar Ficha</span>
               </button>
             </form>
 

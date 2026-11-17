@@ -13,7 +13,17 @@ const aiService = require('../services/aiService');
 async function evaluarDiseno(req, res) {
   try {
     const usuario = req.session.usuario || { id: 2, nombre_completo: 'Estudiante INFOCAL' };
-    const { titulo_diseno, tipo_diseno, contexto_diseno, proyecto_id } = req.body;
+    const {
+      titulo_diseno,
+      tipo_diseno,
+      contexto_diseno,
+      publico_objetivo,
+      tono_estilo,
+      mensaje_clave,
+      aspecto_prioritario,
+      duda_especifica,
+      proyecto_id
+    } = req.body;
 
     if (!req.file) {
       return res.status(400).json({
@@ -26,13 +36,27 @@ async function evaluarDiseno(req, res) {
     const mimeType = req.file.mimetype;
     const imagenUrl = `/uploads/${req.file.filename}`;
 
+    const contextoDetallado = [
+      contexto_diseno,
+      publico_objetivo ? `Público Objetivo: ${publico_objetivo}` : '',
+      tono_estilo ? `Tono Visual: ${tono_estilo}` : '',
+      mensaje_clave ? `Mensaje Central / CTA: ${mensaje_clave}` : '',
+      aspecto_prioritario ? `Aspecto Prioritario Solicitado: ${aspecto_prioritario}` : '',
+      duda_especifica ? `Duda Específica del Estudiante: ${duda_especifica}` : ''
+    ].filter(Boolean).join('. ');
+
     // 1. Invocar el motor multimodal de Gemini
     const resultadoIA = await aiService.analizarDisenoGrafico({
       imagePath,
       mimeType,
       titulo: titulo_diseno || 'Diseño Gráfico',
       tipoDiseno: tipo_diseno || 'afiche',
-      contexto: contexto_diseno || ''
+      contexto: contextoDetallado,
+      publicoObjetivo: publico_objetivo || '',
+      tonoEstilo: tono_estilo || '',
+      mensajeClave: mensaje_clave || '',
+      aspectoPrioritario: aspecto_prioritario || '',
+      dudaEspecifica: duda_especifica || ''
     });
 
     // 2. Persistir en la base de datos MySQL

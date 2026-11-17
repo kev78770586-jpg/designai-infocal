@@ -25,6 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style> body { font-family: 'Plus Jakarta Sans', sans-serif; } </style>
 </head>
 <body class="bg-[#F8FAFC] text-[#1E293B] min-h-screen flex flex-col md:flex-row antialiased">
@@ -124,9 +125,16 @@
       <section class="lg:col-span-2 space-y-6">
         <form id="ideasForm" class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-5">
           
+          <div class="border-b border-slate-100 pb-3">
+            <h3 class="text-xs font-extrabold text-[#002D62] uppercase tracking-wider flex items-center space-x-2">
+              <span>💡</span>
+              <span>Brief Creativo Guiado para Dirección de Arte</span>
+            </h3>
+          </div>
+
           <div>
             <label for="briefIdea" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-              Descripción o Brief del Proyecto *
+              1. Descripción del Problema o Brief a Resolver *
             </label>
             <textarea id="briefIdea" required rows="3" placeholder="Ej: Campaña para concienciar a los jóvenes de Santa Cruz sobre el consumo responsable de agua potable en época de sequía..."
               class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-600 focus:border-transparent outline-none text-sm text-[#1E293B]"></textarea>
@@ -135,24 +143,54 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label for="categoriaIdea" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Categoría del Proyecto *
+                2. Categoría del Proyecto *
               </label>
               <select id="categoriaIdea" required
                 class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
                 <option value="Campaña Social y Concientización" selected>Campaña Social y Concientización</option>
                 <option value="Branding e Identidad de Marca">Branding e Identidad de Marca</option>
-                <option value="Publicidad Comercial y Producto">Publicidad Comercial y Producto</option>
-                <option value="Diseño Cultural y Regional">Diseño Cultural y Regional</option>
-                <option value="Packaging y Empaque">Packaging y Empaque</option>
+                <option value="Publicidad Comercial y Lanzamiento">Publicidad Comercial y Producto</option>
+                <option value="Diseño Cultural y Regional Cruceño">Diseño Cultural y Regional Cruceño</option>
+                <option value="Packaging y Empaque Comercial">Packaging y Empaque</option>
+                <option value="Eventos, Conciertos y Festivales">Eventos, Conciertos y Festivales</option>
               </select>
             </div>
 
             <div>
               <label for="publicoIdea" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Público Meta
+                3. Público Meta y Contexto Cultural *
               </label>
-              <input type="text" id="publicoIdea" placeholder="Ej: Universitarios y familias de Santa Cruz"
+              <input type="text" id="publicoIdea" required placeholder="Ej: Universitarios cruceños de 18-25 años y familias"
                 class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-600 focus:border-transparent outline-none text-sm text-[#1E293B]">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="emocionDetonante" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                4. Emoción o Reacción Buscada *
+              </label>
+              <select id="emocionDetonante"
+                class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
+                <option value="Empatía profunda y sentido de urgencia" selected>Empatía y Conciencia de Urgencia</option>
+                <option value="Asombro, curiosidad y fascinación visual">Asombro y Curiosidad Visual</option>
+                <option value="Orgullo, pertenencia e identidad regional">Orgullo e Identidad Regional</option>
+                <option value="Alegría, vitalidad y dinamismo juvenil">Alegría y Vitalidad Juvenil</option>
+                <option value="Elegancia, exclusividad y estatus">Elegancia y Exclusividad</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="enfoqueCreativo" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                5. Enfoque Creativo Preferido *
+              </label>
+              <select id="enfoqueCreativo"
+                class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-600 focus:border-transparent outline-none text-sm text-[#1E293B] bg-white">
+                <option value="Metáfora visual y símbolo gráfico potente" selected>Metáfora Visual Conceptual</option>
+                <option value="Storytelling y narrativa secuencial">Storytelling y Narrativa Emocional</option>
+                <option value="Minimalismo provocador de alto contraste">Minimalismo de Alto Contraste</option>
+                <option value="Ilustración surrealista o figurativa">Ilustración Simbólica Contemporánea</option>
+              </select>
             </div>
           </div>
 
