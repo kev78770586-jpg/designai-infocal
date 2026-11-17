@@ -1,0 +1,23 @@
+# Configuración de Despliegue en Netlify para DesignAI
+# INFOCAL Santa Cruz - Carrera de Diseño Gráfico
+
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+  command = "npm install"
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["database/**", "models/**", "routes/**", "controllers/**", "services/**", "config/**"]
+
+# Redirigir todas las llamadas /api/* a la función serverless de Express
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/api/:splat"
+  status = 200
+
+# Servir la pantalla de acceso por defecto si se accede a la raíz
+[[redirects]]
+  from = "/"
+  to = "/login.html"
+  status = 200

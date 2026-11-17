@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gradBrand" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#002D62" />
+      <stop offset="100%" stop-color="#2563EB" />
+    </linearGradient>
+  </defs>
+  <rect width="320" height="80" rx="10" fill="#002D62"/>
+  <!-- Emblema Geométrico de Diseño e Innovación -->
+  <g transform="translate(18, 15)">
+    <rect x="0" y="0" width="50" height="50" rx="8" fill="#FFFFFF"/>
+    <path d="M12 12 L38 12 L38 20 L28 20 L28 38 L20 38 L20 20 L12 20 Z" fill="#002D62"/>
+    <circle cx="36" cy="36" r="6" fill="#7C3AED"/>
+  </g>
+  <!-- Textos Institucionales INFOCAL -->
+  <text x="80" y="36" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="900" fill="#FFFFFF" letter-spacing="1.5">INFOCAL</text>
+  <text x="80" y="52" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#93C5FD" letter-spacing="2">SANTA CRUZ</text>
+  <text x="80" y="65" font-family="system-ui, -apple-system, sans-serif" font-size="8.5" font-weight="500" fill="#E2E8F0">Carrera de Diseño Gráfico</text>
+</svg>
