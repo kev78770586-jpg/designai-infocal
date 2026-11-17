@@ -187,14 +187,16 @@ async function startServer() {
     console.log('   Plataforma de Asistencia para el Aprendizaje de Diseño Gráfico');
     console.log('===============================================================');
 
-    // Intentar verificación no bloqueante de conexión a Base de Datos
+    // Verificación y sincronización automática de Base de Datos
     sequelize.authenticate()
-      .then(() => {
+      .then(async () => {
         console.log('✅ Base de Datos MySQL conectada exitosamente.');
+        await sequelize.sync();
+        console.log('📊 Tablas creadas/sincronizadas automáticamente por Sequelize.');
       })
       .catch((err) => {
-        console.warn('⚠️  Aviso: No se pudo conectar a MySQL en este momento (' + err.message + ').');
-        console.warn('    Asegúrate de que el servicio MySQL esté iniciado y corre "npm run db:migrate".');
+        console.warn('⚠️  Aviso: No se pudo conectar a MySQL (' + err.message + ').');
+        console.warn('    El servidor continuará en modo seguro de contingencia.');
       });
 
     app.listen(PORT, () => {
